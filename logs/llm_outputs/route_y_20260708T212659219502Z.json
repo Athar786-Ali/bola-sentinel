@@ -1,0 +1,7 @@
+{
+  "route_id": "route_y",
+  "timestamp": "20260708T212659219502Z",
+  "model": "qwen2.5:7b-instruct",
+  "raw_response": "raw",
+  "parsed_successfully": false
+}

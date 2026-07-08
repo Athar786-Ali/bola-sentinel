@@ -1,0 +1,7 @@
+{
+  "route_id": "POST_/orders/{orderId}/cancel_42",
+  "timestamp": "20260708T212855273593Z",
+  "model": "qwen2.5:7b-instruct",
+  "raw_response": "{\"applicable_model\": \"OWNERSHIP\"}",
+  "parsed_successfully": false
+}

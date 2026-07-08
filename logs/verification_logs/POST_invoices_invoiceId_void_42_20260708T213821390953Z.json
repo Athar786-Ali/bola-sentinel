@@ -1,0 +1,17 @@
+{
+  "route_id": "POST_/invoices/{invoiceId}/void_42",
+  "timestamp": "20260708T213821390953Z",
+  "final_verdict": "INCONCLUSIVE",
+  "attack_request": {
+    "headers": {}
+  },
+  "response": {
+    "status_code": 0,
+    "body_snippet": ""
+  },
+  "state_check": {
+    "before": null,
+    "after": null,
+    "state_changed": null
+  }
+}

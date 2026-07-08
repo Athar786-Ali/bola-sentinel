@@ -1,0 +1,7 @@
+{
+  "route_id": "POST_/orders/{orderId}/cancel_42",
+  "timestamp": "20260708T212855271271Z",
+  "model": "qwen2.5:7b-instruct",
+  "raw_response": "This is not JSON at all, sorry!",
+  "parsed_successfully": false
+}

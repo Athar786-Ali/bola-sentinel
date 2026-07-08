@@ -1,0 +1,28 @@
+{
+  "_comment": "Test user credentials for dynamic verification probes. Fill in per target application.",
+  "_format_notes": [
+    "user_a = ATTACKER — their auth_header is sent with every probe request.",
+    "user_b = VICTIM  — their owned_object_ids supply the target object IDs.",
+    "owned_object_ids keys must match resource path segments in the target API.",
+    "Example: key 'orders' matches route path /orders/:orderId or /orders/{orderId}.",
+    "Sensitive tokens are used only at runtime and never committed to git."
+  ],
+  "user_a": {
+    "auth_header": "Bearer REPLACE_WITH_USER_A_TOKEN",
+    "user_id": "1",
+    "owned_object_ids": {
+      "orders": ["10", "11"],
+      "projects": ["20"],
+      "posts": ["30", "31"]
+    }
+  },
+  "user_b": {
+    "auth_header": "Bearer REPLACE_WITH_USER_B_TOKEN",
+    "user_id": "2",
+    "owned_object_ids": {
+      "orders": ["12"],
+      "projects": ["21"],
+      "posts": ["32"]
+    }
+  }
+}

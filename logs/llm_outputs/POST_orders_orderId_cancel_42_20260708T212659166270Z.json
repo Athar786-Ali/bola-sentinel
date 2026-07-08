@@ -1,0 +1,7 @@
+{
+  "route_id": "POST_/orders/{orderId}/cancel_42",
+  "timestamp": "20260708T212659166270Z",
+  "model": "qwen2.5:7b-instruct",
+  "raw_response": "{\"applicable_model\": \"OWNERSHIP\", \"is_vulnerable\": true, \"confidence\": \"HIGH\", \"explanation\": \"No ownership check was found before the DB delete call.\", \"suggested_test_description\": \"Access victim order with attacker token.\", \"requires_two_users\": true}",
+  "parsed_successfully": true
+}

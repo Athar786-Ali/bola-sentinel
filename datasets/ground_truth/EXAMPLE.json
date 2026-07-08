@@ -1,0 +1,24 @@
+[
+  {
+    "_comment": "Example ground-truth entry — copy and adapt for your target app.",
+    "_format_notes": [
+      "route_id must match exactly the route_id in final_verified_results.json",
+      "actually_vulnerable: true = real vulnerability, false = not vulnerable (expected safe)",
+      "source: 'juice_shop' | 'cve' | 'advisory' | 'manual_review'",
+      "cve_id: optional, null if not applicable",
+      "notes: evidence source (manual code review, CVE writeup, bug bounty report, etc.)"
+    ],
+    "route_id": "POST_/api/Products/1_88",
+    "actually_vulnerable": true,
+    "source": "juice_shop",
+    "cve_id": null,
+    "notes": "OWASP Juice Shop API1:2023 — any user can modify any product via POST /api/Products/:id"
+  },
+  {
+    "route_id": "DELETE_/api/Users/1_102",
+    "actually_vulnerable": false,
+    "source": "juice_shop",
+    "cve_id": null,
+    "notes": "Juice Shop verifies session ownership before allowing account deletion"
+  }
+]

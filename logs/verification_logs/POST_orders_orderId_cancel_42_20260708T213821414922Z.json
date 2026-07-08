@@ -1,0 +1,29 @@
+{
+  "route_id": "POST_/orders/{orderId}/cancel_42",
+  "timestamp": "20260708T213821414922Z",
+  "final_verdict": "CONFIRMED_VULNERABLE",
+  "attack_request": {
+    "url": "http://localhost:3000/orders/12/cancel",
+    "method": "POST",
+    "headers": {
+      "Authorization": "<redacted>",
+      "Content-Type": "application/json"
+    },
+    "attacker_user_id": "1",
+    "victim_object_id": "12",
+    "resource_type": "orders"
+  },
+  "response": {
+    "status_code": 200,
+    "body_snippet": "{\"s\": \"b\"}"
+  },
+  "state_check": {
+    "before": {
+      "s": "a"
+    },
+    "after": {
+      "s": "b"
+    },
+    "state_changed": true
+  }
+}
