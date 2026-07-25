@@ -1,37 +1,80 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FileText, Download, ChevronRight } from 'lucide-react';
+import { FileText, Download, ChevronRight, Loader2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-// Note: In a real implementation, you'd install and import react-markdown and remark-gfm
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
-const MOCK_REPORTS = [
-  { id: '1', name: 'evaluation_juice_shop.md', date: '2026-07-25 14:30' },
-  { id: '2', name: 'evaluation_vuln-nodejs-app.md', date: '2026-07-24 09:15' },
-];
-
-const MOCK_MD = `
-# BOLA Detection Report: juice_shop
-
-## Summary
-- **Total Routes Analyzed**: 45
-- **BOLA Vulnerabilities Confirmed**: 5
-- **False Positives (Filtered by Dynamic Verification)**: 7
-
-## Detailed Findings
-
-| Endpoint | Method | LLM Status | Dynamic Status | Final |
-|---|---|---|---|---|
-| \`/api/users/:id\` | GET | FLAGGED | CONFIRMED | **BOLA** |
-| \`/api/orders/:id\` | GET | FLAGGED | REJECTED | SAFE |
-
-### Explanation for \`/api/users/:id\`
-The LLM correctly identified that the endpoint takes a user ID parameter but lacks explicit authorization checks before returning the user profile. Dynamic verification successfully confirmed that user A can access user B's profile.
-`;
+interface Report {
+  name: string;
+  path?: string;
+  date?: string;
+}
 
 export default function ReportsPage() {
-  const [activeReport, setActiveReport] = useState(MOCK_REPORTS[0].id);
+  const [reports, setReports] = useState<Report[]>([]);
+  const [activeReport, setActiveReport] = useState<string>('');
+  const [content, setContent] = useState<string>('');
+  const [loadingList, setLoadingList] = useState(true);
+  const [loadingContent, setLoadingContent] = useState(false);
+
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        const res = await fetch('/api/reports');
+        if (!res.ok) throw new Error('Failed to fetch reports');
+        const data = await res.json();
+        const fetchedReports = data.reports || [];
+        setReports(fetchedReports);
+        
+        if (fetchedReports.length > 0) {
+          setActiveReport(fetchedReports[0].name);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoadingList(false);
+      }
+    };
+    
+    fetchReports();
+  }, []);
+
+  useEffect(() => {
+    if (!activeReport) return;
+    
+    const fetchReportContent = async () => {
+      setLoadingContent(true);
+      try {
+        const res = await fetch(`/api/reports/${encodeURIComponent(activeReport)}`);
+        if (!res.ok) throw new Error('Failed to fetch report content');
+        const data = await res.json();
+        setContent(data.content || '');
+      } catch (error) {
+        console.error(error);
+        setContent('# Error\nFailed to load report content.');
+      } finally {
+        setLoadingContent(false);
+      }
+    };
+    
+    fetchReportContent();
+  }, [activeReport]);
+
+  const handleDownload = () => {
+    if (!content || !activeReport) return;
+    const blob = new Blob([content], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = activeReport;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <motion.div 
@@ -44,81 +87,89 @@ export default function ReportsPage() {
       </div>
 
       <div className="flex flex-col md:flex-row gap-6 flex-1 min-h-0">
-        <div className="w-full md:w-64 shrink-0 flex flex-col gap-2">
-          {MOCK_REPORTS.map(report => (
-            <button
-              key={report.id}
-              onClick={() => setActiveReport(report.id)}
-              className={cn(
-                "flex items-center gap-3 p-3 rounded-lg text-left transition-all border",
-                activeReport === report.id
-                  ? "bg-slate-800 border-slate-700 text-slate-200 shadow-sm"
-                  : "bg-slate-900/50 border-transparent text-slate-400 hover:bg-slate-800/50 hover:text-slate-300"
-              )}
-            >
-              <FileText className="w-5 h-5" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{report.name}</p>
-                <p className="text-xs opacity-60">{report.date}</p>
-              </div>
-              {activeReport === report.id && <ChevronRight className="w-4 h-4" />}
-            </button>
-          ))}
+        <div className="w-full md:w-64 shrink-0 flex flex-col gap-2 overflow-y-auto pr-2">
+          {loadingList ? (
+            <div className="flex items-center justify-center py-8 text-slate-400">
+              <Loader2 className="w-6 h-6 animate-spin" />
+            </div>
+          ) : reports.length === 0 ? (
+            <div className="text-slate-500 text-sm p-4 text-center border border-dashed border-slate-700 rounded-lg">
+              No reports found.
+            </div>
+          ) : (
+            reports.map((report, idx) => (
+              <motion.button
+                key={report.name}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.05 }}
+                onClick={() => setActiveReport(report.name)}
+                className={cn(
+                  "flex items-center gap-3 p-3 rounded-lg text-left transition-all border",
+                  activeReport === report.name
+                    ? "bg-slate-800 border-slate-700 text-slate-200 shadow-sm"
+                    : "bg-slate-900/50 border-transparent text-slate-400 hover:bg-slate-800/50 hover:text-slate-300"
+                )}
+              >
+                <FileText className="w-5 h-5 shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{report.name}</p>
+                  {report.date && <p className="text-xs opacity-60">{report.date}</p>}
+                </div>
+                {activeReport === report.name && <ChevronRight className="w-4 h-4 shrink-0" />}
+              </motion.button>
+            ))
+          )}
         </div>
 
-        <div className="flex-1 bg-slate-900/50 border border-slate-800 rounded-xl backdrop-blur-md flex flex-col min-w-0">
-          <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/50">
-            <h2 className="font-medium text-slate-200 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-slate-400" />
-              {MOCK_REPORTS.find(r => r.id === activeReport)?.name}
+        <div className="flex-1 bg-slate-900/50 border border-slate-800 rounded-xl backdrop-blur-md flex flex-col min-w-0 shadow-lg overflow-hidden">
+          <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/80">
+            <h2 className="font-medium text-slate-200 flex items-center gap-2 truncate">
+              <FileText className="w-4 h-4 text-slate-400 shrink-0" />
+              <span className="truncate">{activeReport || 'Select a report'}</span>
             </h2>
-            <button className="p-2 hover:bg-slate-800 rounded-md text-slate-400 hover:text-slate-200 transition-colors">
+            <button 
+              onClick={handleDownload}
+              disabled={!activeReport || !content || loadingContent}
+              className="p-2 bg-slate-900 border border-slate-800 hover:bg-slate-800 rounded-md text-slate-400 hover:text-slate-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Download Report"
+            >
               <Download className="w-4 h-4" />
             </button>
           </div>
-          <div className="p-6 overflow-y-auto flex-1 prose prose-invert prose-slate max-w-none">
-            {/* Replace with actual ReactMarkdown implementation */}
-            <div dangerouslySetInnerHTML={{ __html: `
-              <h1 class="text-2xl font-bold text-white mb-4">BOLA Detection Report: juice_shop</h1>
-              <h2 class="text-xl font-semibold text-slate-200 mt-6 mb-3">Summary</h2>
-              <ul class="list-disc pl-5 text-slate-300 space-y-1 mb-6">
-                <li><strong>Total Routes Analyzed</strong>: 45</li>
-                <li><strong>BOLA Vulnerabilities Confirmed</strong>: 5</li>
-                <li><strong>False Positives (Filtered by Dynamic Verification)</strong>: 7</li>
-              </ul>
-              <h2 class="text-xl font-semibold text-slate-200 mt-6 mb-3">Detailed Findings</h2>
-              <div class="overflow-x-auto mb-6">
-                <table class="w-full border-collapse border border-slate-700 text-sm">
-                  <thead class="bg-slate-800">
-                    <tr>
-                      <th class="border border-slate-700 px-4 py-2 text-left">Endpoint</th>
-                      <th class="border border-slate-700 px-4 py-2 text-left">Method</th>
-                      <th class="border border-slate-700 px-4 py-2 text-left">LLM Status</th>
-                      <th class="border border-slate-700 px-4 py-2 text-left">Dynamic Status</th>
-                      <th class="border border-slate-700 px-4 py-2 text-left">Final</th>
-                    </tr>
-                  </thead>
-                  <tbody class="text-slate-300">
-                    <tr class="bg-slate-900/50">
-                      <td class="border border-slate-700 px-4 py-2 font-mono text-blue-300">/api/users/:id</td>
-                      <td class="border border-slate-700 px-4 py-2">GET</td>
-                      <td class="border border-slate-700 px-4 py-2 text-amber-400">FLAGGED</td>
-                      <td class="border border-slate-700 px-4 py-2 text-red-400">CONFIRMED</td>
-                      <td class="border border-slate-700 px-4 py-2 font-bold text-red-400">BOLA</td>
-                    </tr>
-                    <tr class="bg-slate-900/50">
-                      <td class="border border-slate-700 px-4 py-2 font-mono text-blue-300">/api/orders/:id</td>
-                      <td class="border border-slate-700 px-4 py-2">GET</td>
-                      <td class="border border-slate-700 px-4 py-2 text-amber-400">FLAGGED</td>
-                      <td class="border border-slate-700 px-4 py-2 text-emerald-400">REJECTED</td>
-                      <td class="border border-slate-700 px-4 py-2 text-emerald-400">SAFE</td>
-                    </tr>
-                  </tbody>
-                </table>
+          
+          <div className="p-6 overflow-y-auto flex-1 bg-slate-950/30">
+            {loadingContent ? (
+              <div className="flex flex-col items-center justify-center h-full text-slate-400">
+                <Loader2 className="w-8 h-8 animate-spin mb-4" />
+                <p>Loading report content...</p>
               </div>
-              <h3 class="text-lg font-semibold text-slate-200 mt-6 mb-2">Explanation for <code class="bg-slate-800 px-1 py-0.5 rounded text-sm text-blue-300">/api/users/:id</code></h3>
-              <p class="text-slate-300">The LLM correctly identified that the endpoint takes a user ID parameter but lacks explicit authorization checks before returning the user profile. Dynamic verification successfully confirmed that user A can access user B's profile.</p>
-            `}} />
+            ) : !activeReport ? (
+              <div className="flex flex-col items-center justify-center h-full text-slate-500">
+                <FileText className="w-12 h-12 mb-4 opacity-50" />
+                <p>Select a report to view</p>
+              </div>
+            ) : !content ? (
+              <div className="flex flex-col items-center justify-center h-full text-slate-500">
+                <AlertCircle className="w-12 h-12 mb-4 opacity-50" />
+                <p>Report is empty.</p>
+              </div>
+            ) : (
+              <div className="prose prose-invert prose-slate max-w-none 
+                prose-headings:text-white prose-headings:font-bold 
+                prose-a:text-blue-400 
+                prose-code:bg-slate-900 prose-code:font-mono prose-code:px-1 prose-code:py-0.5 prose-code:rounded 
+                prose-pre:bg-slate-900 prose-pre:border prose-pre:border-slate-800
+                prose-table:border-collapse prose-table:w-full prose-table:text-sm
+                prose-th:border prose-th:border-slate-700 prose-th:bg-slate-800 prose-th:p-2 prose-th:text-left
+                prose-td:border prose-td:border-slate-700 prose-td:p-2 prose-td:bg-slate-900/50
+                prose-ul:text-slate-300 prose-ol:text-slate-300 prose-p:text-slate-300
+              ">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {content}
+                </ReactMarkdown>
+              </div>
+            )}
           </div>
         </div>
       </div>

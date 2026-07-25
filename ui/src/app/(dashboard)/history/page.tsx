@@ -8,14 +8,14 @@ const fadeIn = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } }, hidden: {} };
 
 interface Run {
-  id: string;
-  app_name: string;
-  timestamp: string;
+  id: string; // generating an ID since it might not be in API
+  application_name: string;
+  run_timestamp: string;
   status: 'SUCCESS' | 'FAILED' | 'SKIPPED';
-  duration: string;
+  duration_seconds: number;
   phases_completed: number;
-  model: string;
   error?: string;
+  results_dir?: string;
 }
 
 export default function HistoryPage() {
@@ -25,19 +25,26 @@ export default function HistoryPage() {
   const [filterApp, setFilterApp] = useState('All');
 
   useEffect(() => {
-    // Simulate fetching /api/history
-    setTimeout(() => {
-      setRuns([
-        { id: '1', app_name: 'vAmPI', timestamp: '2026-07-25T14:30:00Z', status: 'SUCCESS', duration: '45s', phases_completed: 5, model: 'qwen2.5:7b-instruct' },
-        { id: '2', app_name: 'crAPI', timestamp: '2026-07-25T12:15:00Z', status: 'FAILED', duration: '12s', phases_completed: 2, model: 'qwen2.5:7b-instruct', error: 'Docker connection timeout.' },
-        { id: '3', app_name: 'vAmPI', timestamp: '2026-07-24T09:00:00Z', status: 'SUCCESS', duration: '42s', phases_completed: 5, model: 'llama3:8b' }
-      ]);
-      setLoading(false);
-    }, 1000);
+    async function fetchHistory() {
+      try {
+        const res = await fetch('/api/history');
+        if (res.ok) {
+          const data = await res.json();
+          // Assuming data is an array of runs
+          setRuns(data.map((r: any, i: number) => ({ ...r, id: String(i) })));
+        }
+      } catch (err) {
+        console.error('Failed to fetch history', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchHistory();
   }, []);
 
-  const filteredRuns = runs.filter(r => filterApp === 'All' || r.app_name === filterApp);
+  const filteredRuns = runs.filter(r => filterApp === 'All' || r.application_name === filterApp);
   const successCount = runs.filter(r => r.status === 'SUCCESS').length;
+  const appNames = Array.from(new Set(runs.map(r => r.application_name)));
 
   return (
     <div className="p-8 max-w-6xl mx-auto space-y-8 min-h-screen">
@@ -68,8 +75,9 @@ export default function HistoryPage() {
               className="w-full bg-slate-950 border border-slate-800 text-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none"
              >
                <option value="All">All Applications</option>
-               <option value="vAmPI">vAmPI</option>
-               <option value="crAPI">crAPI</option>
+               {appNames.map(name => (
+                 <option key={name} value={name}>{name}</option>
+               ))}
              </select>
           </div>
         </motion.div>
@@ -98,19 +106,15 @@ export default function HistoryPage() {
                   {run.status === 'SKIPPED' && <AlertCircle className="w-6 h-6 text-slate-500" />}
                   
                   <div>
-                    <h4 className="font-semibold text-slate-200">{run.app_name}</h4>
+                    <h4 className="font-semibold text-slate-200">{run.application_name}</h4>
                     <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
-                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3"/> {new Date(run.timestamp).toLocaleString()}</span>
-                      <span className="flex items-center gap-1"><Timer className="w-3 h-3"/> {run.duration}</span>
+                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3"/> {new Date(run.run_timestamp).toLocaleString()}</span>
+                      <span className="flex items-center gap-1"><Timer className="w-3 h-3"/> {run.duration_seconds}s</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-6">
-                  <div className="text-right">
-                    <p className="text-xs text-slate-400">Model</p>
-                    <p className="text-sm font-mono text-slate-300">{run.model}</p>
-                  </div>
                   <div className="text-right hidden sm:block">
                     <p className="text-xs text-slate-400">Phases</p>
                     <p className="text-sm text-slate-300">{run.phases_completed}/5</p>

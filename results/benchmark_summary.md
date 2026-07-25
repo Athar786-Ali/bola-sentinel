@@ -1,6 +1,6 @@
 # BOLA-Sentinel Benchmark Summary
 
-> Run timestamp: `20260725T125425Z`  
+> Run timestamp: `20260725T210715Z`  
 > Applications tested: 2  
 > Successful: 2  |  Failed: 0
 
@@ -19,7 +19,7 @@
 | Stage | TP | FP | FN | TN | Precision | Recall | F1 | FPR | FNR |
 |-------|----|----|----|----|-----------|--------|-----|-----|-----|
 | Stage 1 — Static Only | 6 | 52 | 0 | 0 | 0.103 | 1.000 | 0.188 | 100.0% | 0.0% |
-| Stage 2 — Static + LLM | 3 | 7 | 3 | 45 | 0.300 | 0.500 | 0.375 | 13.5% | 50.0% |
+| Stage 2 — Static + LLM | 2 | 7 | 4 | 45 | 0.222 | 0.333 | 0.267 | 13.5% | 66.7% |
 | Stage 3 — Full Pipeline | 0 | 0 | 6 | 52 | 0.000 | 0.000 | 0.000 | 0.0% | 100.0% |
 
 ## Multi-Dataset Comparison
@@ -38,7 +38,7 @@
 | Stage | TP | FP | FN | TN | Precision | Recall | F1 | FPR | FNR |
 |-------|----|----|----|----|-----------|--------|-----|-----|-----|
 | **Stage 1** — Static Only | 6 | 56 | 4 | 0 | 0.097 | 0.600 | 0.167 | 100.0% | 40.0% |
-| **Stage 2** — Static + LLM | 3 | 7 | 7 | 49 | 0.300 | 0.300 | 0.300 | 12.5% | 70.0% |
+| **Stage 2** — Static + LLM | 2 | 7 | 8 | 49 | 0.222 | 0.200 | 0.210 | 12.5% | 80.0% |
 | **Stage 3** — Full Pipeline | 0 | 0 | 10 | 56 | 0.000 | 0.000 | 0.000 | 0.0% | 100.0% |
 
 ## False-Positive Reduction — Primary Research Claim
@@ -56,5 +56,5 @@ Adding LLM reasoning and then dynamic verification reduced false positives by a 
 Every run is fully logged:
 - `results/benchmark_runs/<app>/`  — per-app phase outputs
 - `results/benchmark_runs/run_manifest.json`  — run manifest with status + duration
-- `logs/evaluation_logs/benchmark_20260725T125425Z.json`  — full aggregated log
+- `logs/evaluation_logs/benchmark_20260725T210715Z.json`  — full aggregated log
 

@@ -49,24 +49,35 @@ export default function ResultsPage() {
     );
   }
 
-  // Sample data manipulation based on expected API response or placeholders
+  const pooled = data?.pooled_overall_results || {};
+  const perApp = data?.per_application_results || {};
+  const appNames = Object.keys(perApp);
+
   const stageData = [
-    { name: 'Stage 1', TP: 45, FP: 120, FN: 5, TN: 200 },
-    { name: 'Stage 2', TP: 43, FP: 40, FN: 7, TN: 280 },
-    { name: 'Stage 3', TP: 40, FP: 5, FN: 10, TN: 315 },
+    { name: 'Stage 1', TP: pooled.stage_1_static_only?.tp || 0, FP: pooled.stage_1_static_only?.fp || 0, FN: pooled.stage_1_static_only?.fn || 0, TN: pooled.stage_1_static_only?.tn || 0 },
+    { name: 'Stage 2', TP: pooled.stage_2_static_plus_llm?.tp || 0, FP: pooled.stage_2_static_plus_llm?.fp || 0, FN: pooled.stage_2_static_plus_llm?.fn || 0, TN: pooled.stage_2_static_plus_llm?.tn || 0 },
+    { name: 'Stage 3', TP: pooled.stage_3_final_system?.tp || 0, FP: pooled.stage_3_final_system?.fp || 0, FN: pooled.stage_3_final_system?.fn || 0, TN: pooled.stage_3_final_system?.tn || 0 },
   ];
 
-  const radarData = [
-    { metric: 'Precision', 'Juice Shop': 0.89, 'NodeJS App': 0.85 },
-    { metric: 'Recall', 'Juice Shop': 0.8, 'NodeJS App': 0.75 },
-    { metric: 'F1 Score', 'Juice Shop': 0.84, 'NodeJS App': 0.79 },
-    { metric: 'Accuracy', 'Juice Shop': 0.95, 'NodeJS App': 0.92 },
+  const metricsFields = [
+    { key: 'precision', label: 'Precision' },
+    { key: 'recall', label: 'Recall' },
+    { key: 'f1', label: 'F1 Score' },
+    { key: 'accuracy', label: 'Accuracy' }
   ];
+
+  const radarData = metricsFields.map(m => {
+    const row: any = { metric: m.label };
+    appNames.forEach(app => {
+      row[app] = perApp[app]?.stage_3_final_system?.[m.key] || 0;
+    });
+    return row;
+  });
 
   const fpReductionData = [
-    { name: 'Stage 1', FP: 120 },
-    { name: 'Stage 2', FP: 40 },
-    { name: 'Stage 3', FP: 5 },
+    { name: 'Stage 1', FP: pooled.stage_1_static_only?.fp || 0 },
+    { name: 'Stage 2', FP: pooled.stage_2_static_plus_llm?.fp || 0 },
+    { name: 'Stage 3', FP: pooled.stage_3_final_system?.fp || 0 },
   ];
 
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -78,7 +89,7 @@ export default function ResultsPage() {
             <div key={index} className="flex items-center gap-2 text-sm">
               <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
               <span className="text-slate-300">{entry.name}:</span>
-              <span className="text-slate-100 font-medium">{entry.value}</span>
+              <span className="text-slate-100 font-medium">{typeof entry.value === 'number' && entry.value < 1 && entry.value > 0 ? entry.value.toFixed(2) : entry.value}</span>
             </div>
           ))}
         </div>
@@ -86,6 +97,8 @@ export default function ResultsPage() {
     }
     return null;
   };
+
+  const colors = ["#8b5cf6", "#3b82f6", "#10b981", "#ef4444", "#f59e0b"];
 
   return (
     <motion.div 
@@ -154,7 +167,7 @@ export default function ResultsPage() {
           transition={{ delay: 0.3 }}
           className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 backdrop-blur-md lg:col-span-2"
         >
-          <h2 className="text-lg font-semibold text-slate-200 mb-6">App Comparison Metrics</h2>
+          <h2 className="text-lg font-semibold text-slate-200 mb-6">App Comparison Metrics (Stage 3)</h2>
           <div className="flex flex-col lg:flex-row items-center justify-between">
             <div className="w-full lg:w-1/2 h-[350px]">
               <ResponsiveContainer width="100%" height="100%">
@@ -162,8 +175,9 @@ export default function ResultsPage() {
                   <PolarGrid stroke="#1e293b" />
                   <PolarAngleAxis dataKey="metric" tick={{ fill: '#94a3b8', fontSize: 12 }} />
                   <PolarRadiusAxis angle={30} domain={[0, 1]} tick={{ fill: '#475569' }} />
-                  <Radar name="Juice Shop" dataKey="Juice Shop" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.3} />
-                  <Radar name="NodeJS App" dataKey="NodeJS App" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
+                  {appNames.map((app, idx) => (
+                    <Radar key={app} name={app} dataKey={app} stroke={colors[idx % colors.length]} fill={colors[idx % colors.length]} fillOpacity={0.3} />
+                  ))}
                   <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />
                   <Tooltip content={<CustomTooltip />} />
                 </RadarChart>
@@ -181,20 +195,20 @@ export default function ResultsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/50">
-                  <tr className="hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-3 font-medium text-slate-200">Juice Shop</td>
-                    <td className="px-4 py-3 text-emerald-400">89.0%</td>
-                    <td className="px-4 py-3">80.0%</td>
-                    <td className="px-4 py-3">84.0%</td>
-                    <td className="px-4 py-3">95.0%</td>
-                  </tr>
-                  <tr className="hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-3 font-medium text-slate-200">NodeJS App</td>
-                    <td className="px-4 py-3 text-emerald-400">85.0%</td>
-                    <td className="px-4 py-3">75.0%</td>
-                    <td className="px-4 py-3">79.0%</td>
-                    <td className="px-4 py-3">92.0%</td>
-                  </tr>
+                  {appNames.map(app => (
+                    <tr key={app} className="hover:bg-slate-800/30 transition-colors">
+                      <td className="px-4 py-3 font-medium text-slate-200">{app}</td>
+                      <td className="px-4 py-3 text-emerald-400">{(perApp[app]?.stage_3_final_system?.precision * 100 || 0).toFixed(1)}%</td>
+                      <td className="px-4 py-3">{(perApp[app]?.stage_3_final_system?.recall * 100 || 0).toFixed(1)}%</td>
+                      <td className="px-4 py-3">{(perApp[app]?.stage_3_final_system?.f1 * 100 || 0).toFixed(1)}%</td>
+                      <td className="px-4 py-3">{(perApp[app]?.stage_3_final_system?.accuracy * 100 || 0).toFixed(1)}%</td>
+                    </tr>
+                  ))}
+                  {appNames.length === 0 && (
+                     <tr>
+                       <td colSpan={5} className="px-4 py-3 text-center text-slate-500">No applications found.</td>
+                     </tr>
+                  )}
                 </tbody>
               </table>
             </div>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ShieldAlert, ShieldCheck, ChevronDown, ChevronRight, Check, X, AlertTriangle, Loader2 } from 'lucide-react';
+import { Search, ShieldAlert, ShieldCheck, ChevronDown, ChevronRight, Check, X, AlertTriangle, Loader2, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface VulnerabilityRow {
@@ -11,11 +11,13 @@ interface VulnerabilityRow {
   endpoint: string;
   static_flagged: boolean;
   llm_flagged: boolean;
-  llm_confidence: number;
+  llm_confidence: string;
   llm_explanation: string;
   dynamically_verified: boolean;
+  verification_status: string;
   final_verdict: string;
   ground_truth: boolean | null;
+  is_matched: boolean;
   risk_level: string;
 }
 
@@ -38,14 +40,20 @@ export default function ExplorerPage() {
       .catch(() => { setData([]); setLoading(false); });
   }, [activeTab]);
 
-  const filteredData = data.filter(item =>
+  // Separate matched (found by analyzer) vs unmatched (GT-only) entries
+  const matchedData = data.filter(d => d.is_matched !== false && d.http_method !== 'UNKNOWN');
+  const unmatchedGT = data.filter(d => !d.is_matched || d.http_method === 'UNKNOWN');
+
+  const filteredData = matchedData.filter(item =>
     item.endpoint.toLowerCase().includes(search.toLowerCase()) ||
     item.route_id.toLowerCase().includes(search.toLowerCase())
   );
 
-  const totalRoutes = data.length;
-  const llmFlagged = data.filter(d => d.llm_flagged).length;
-  const confirmed = data.filter(d => d.ground_truth === true).length;
+  // Compute stats from REAL data
+  const totalRoutes = matchedData.length;
+  const llmFlagged = matchedData.filter(d => d.llm_flagged).length;
+  const dynamicallyConfirmed = matchedData.filter(d => d.dynamically_verified).length;
+  const gtVulnerable = data.filter(d => d.ground_truth === true).length;
 
   const getMethodColor = (method: string) => {
     switch (method) {
@@ -59,8 +67,21 @@ export default function ExplorerPage() {
   };
 
   const StatusIcon = ({ status }: { status: boolean | null }) => {
-    if (status === null) return <span className="text-slate-600 text-xs">N/A</span>;
+    if (status === null) return <span className="text-slate-600 text-xs">—</span>;
     return status ? <Check className="w-4 h-4 text-emerald-500" /> : <X className="w-4 h-4 text-slate-600" />;
+  };
+
+  const getVerificationBadge = (status: string) => {
+    switch (status) {
+      case 'CONFIRMED_VULNERABLE':
+        return <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-red-500/10 text-red-400">CONFIRMED</span>;
+      case 'NOT_VULNERABLE':
+        return <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-400">SAFE</span>;
+      case 'INCONCLUSIVE':
+        return <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-400">INCONCLUSIVE</span>;
+      default:
+        return <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-500/10 text-slate-500">NOT TESTED</span>;
+    }
   };
 
   return (
@@ -88,11 +109,12 @@ export default function ExplorerPage() {
         </div>
       </motion.div>
 
-      <motion.div variants={fadeIn} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <motion.div variants={fadeIn} className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {[
-          { label: 'Total Routes', value: String(totalRoutes), icon: ShieldCheck, color: 'text-blue-400', bg: 'bg-blue-400/10' },
+          { label: 'Analyzed Routes', value: String(totalRoutes), icon: Eye, color: 'text-blue-400', bg: 'bg-blue-400/10' },
           { label: 'LLM Flagged', value: String(llmFlagged), icon: AlertTriangle, color: 'text-amber-400', bg: 'bg-amber-400/10' },
-          { label: 'Confirmed BOLA', value: String(confirmed), icon: ShieldAlert, color: 'text-red-400', bg: 'bg-red-400/10' },
+          { label: 'Dynamically Confirmed', value: String(dynamicallyConfirmed), icon: ShieldAlert, color: 'text-red-400', bg: 'bg-red-400/10' },
+          { label: 'Ground Truth Vulnerable', value: String(gtVulnerable), icon: ShieldCheck, color: 'text-violet-400', bg: 'bg-violet-400/10' },
         ].map((stat, i) => (
           <div
             key={i}
@@ -108,6 +130,22 @@ export default function ExplorerPage() {
           </div>
         ))}
       </motion.div>
+
+      {/* Unmatched ground truth warning */}
+      {!loading && unmatchedGT.length > 0 && (
+        <motion.div variants={fadeIn} className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4 flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-amber-400 mt-0.5 shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-amber-300">
+              {unmatchedGT.length} unmatched ground truth {unmatchedGT.length === 1 ? 'entry' : 'entries'}
+            </p>
+            <p className="text-xs text-slate-400 mt-1">
+              These ground truth routes were not found by the static analyzer (coverage gap).
+              Route IDs: {unmatchedGT.map(u => u.route_id).join(', ')}
+            </p>
+          </div>
+        </motion.div>
+      )}
 
       <motion.div variants={fadeIn} className="glass-card rounded-2xl overflow-hidden">
         <div className="p-4 border-b border-slate-800 flex items-center gap-4">
@@ -138,7 +176,7 @@ export default function ExplorerPage() {
                   <th className="px-4 py-3">Method</th>
                   <th className="px-4 py-3 text-center">Static</th>
                   <th className="px-4 py-3 text-center">LLM</th>
-                  <th className="px-4 py-3 text-center">Dynamic</th>
+                  <th className="px-4 py-3 text-center">Verification</th>
                   <th className="px-4 py-3 text-center">Ground Truth</th>
                   <th className="px-4 py-3">Risk</th>
                 </tr>
@@ -163,7 +201,7 @@ export default function ExplorerPage() {
                       </td>
                       <td className="px-4 py-3 text-center"><div className="flex justify-center"><StatusIcon status={row.static_flagged} /></div></td>
                       <td className="px-4 py-3 text-center"><div className="flex justify-center"><StatusIcon status={row.llm_flagged} /></div></td>
-                      <td className="px-4 py-3 text-center"><div className="flex justify-center"><StatusIcon status={row.dynamically_verified} /></div></td>
+                      <td className="px-4 py-3 text-center"><div className="flex justify-center">{getVerificationBadge(row.verification_status)}</div></td>
                       <td className="px-4 py-3 text-center"><div className="flex justify-center"><StatusIcon status={row.ground_truth} /></div></td>
                       <td className="px-4 py-3">
                         <span className={cn(
@@ -184,14 +222,17 @@ export default function ExplorerPage() {
                           exit={{ opacity: 0, height: 0 }}
                         >
                           <td colSpan={8} className="px-12 py-4 bg-slate-900/30 border-b border-slate-800/50">
-                            <div className="p-4 bg-slate-950 rounded-lg border border-slate-800 text-sm space-y-2">
-                              <div className="flex items-center gap-4 text-xs text-slate-500">
+                            <div className="p-4 bg-slate-950 rounded-lg border border-slate-800 text-sm space-y-3">
+                              <div className="flex flex-wrap items-center gap-4 text-xs text-slate-500">
                                 <span>Route ID: <code className="text-slate-300">{row.route_id}</code></span>
-                                <span>Confidence: <code className="text-slate-300">{(row.llm_confidence * 100).toFixed(0)}%</code></span>
-                                <span>Verdict: <code className="text-slate-300">{row.final_verdict}</code></span>
+                                <span>LLM Confidence: <code className="text-slate-300">{row.llm_confidence}</code></span>
+                                <span>Verification: <code className="text-slate-300">{row.verification_status}</code></span>
+                                <span>Final Verdict: <code className="text-slate-300">{row.final_verdict}</code></span>
                               </div>
-                              <h4 className="font-semibold text-slate-300">LLM Explanation</h4>
-                              <p className="text-slate-400">{row.llm_explanation || 'No explanation available.'}</p>
+                              <div>
+                                <h4 className="font-semibold text-slate-300 mb-1">LLM Explanation</h4>
+                                <p className="text-slate-400 text-xs leading-relaxed">{row.llm_explanation || 'No explanation available (route was not flagged by LLM).'}</p>
+                              </div>
                             </div>
                           </td>
                         </motion.tr>

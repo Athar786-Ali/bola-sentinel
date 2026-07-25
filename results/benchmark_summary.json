@@ -1,5 +1,5 @@
 {
-  "run_timestamp": "20260725T125425Z",
+  "run_timestamp": "20260725T210715Z",
   "applications_tested": [
     "vuln-nodejs-app",
     "juice_shop"
@@ -81,18 +81,18 @@
         "accuracy": 0.1034
       },
       "stage_2_static_plus_llm": {
-        "tp": 3,
+        "tp": 2,
         "fp": 7,
-        "fn": 3,
+        "fn": 4,
         "tn": 45,
         "evaluated": 58,
         "skipped": 0,
-        "precision": 0.3,
-        "recall": 0.5,
-        "f1": 0.375,
+        "precision": 0.2222,
+        "recall": 0.3333,
+        "f1": 0.2667,
         "false_positive_rate": 0.1346,
-        "false_negative_rate": 0.5,
-        "accuracy": 0.8276
+        "false_negative_rate": 0.6667,
+        "accuracy": 0.8103
       },
       "stage_3_final_system": {
         "tp": 0,
@@ -128,17 +128,17 @@
       "false_negative_rate": 0.4
     },
     "stage_2_static_plus_llm": {
-      "tp": 3,
+      "tp": 2,
       "fp": 7,
-      "fn": 7,
+      "fn": 8,
       "tn": 49,
       "evaluated": 62,
       "skipped": 0,
-      "precision": 0.3,
-      "recall": 0.3,
-      "f1": 0.3,
+      "precision": 0.2222,
+      "recall": 0.2,
+      "f1": 0.2105,
       "false_positive_rate": 0.125,
-      "false_negative_rate": 0.7
+      "false_negative_rate": 0.8
     },
     "stage_3_final_system": {
       "tp": 0,

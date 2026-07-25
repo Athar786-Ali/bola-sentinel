@@ -1,18 +1,22 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Database, Folder, Link as LinkIcon, GitCommit, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Database, Folder, Link as LinkIcon, GitCommit, CheckCircle2, XCircle } from 'lucide-react';
 
 const fadeIn = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
 const stagger = { visible: { transition: { staggerChildren: 0.08 } }, hidden: {} };
 
-interface Dataset {
-  app_name: string;
+interface DatasetAPI {
+  application_name: string;
   source_path: string;
   base_url: string;
+  test_users_file: string;
+  ground_truth_file: string;
   git_commit: string;
   dataset_version: string;
+}
+
+interface Dataset extends DatasetAPI {
   ground_truth_size?: number;
   coverage?: number;
   validation_status: 'valid' | 'invalid' | 'unknown';
@@ -23,14 +27,43 @@ export default function DatasetsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate fetching /api/datasets
-    setTimeout(() => {
-      setDatasets([
-        { app_name: 'vAmPI', source_path: '/apps/vAmPI', base_url: 'http://localhost:5000', git_commit: 'a1b2c3d', dataset_version: '1.0', ground_truth_size: 42, coverage: 85, validation_status: 'valid' },
-        { app_name: 'crAPI', source_path: '/apps/crAPI', base_url: 'http://localhost:8888', git_commit: 'f4e5d6c', dataset_version: '2.1', ground_truth_size: 156, coverage: 92, validation_status: 'valid' }
-      ]);
-      setLoading(false);
-    }, 1000);
+    async function fetchData() {
+      try {
+        const [datasetsRes, metricsRes] = await Promise.all([
+          fetch('/api/datasets'),
+          fetch('/api/metrics')
+        ]);
+        
+        let datasetsData: DatasetAPI[] = [];
+        if (datasetsRes.ok) {
+          datasetsData = await datasetsRes.json();
+        }
+
+        let metricsData: any = {};
+        if (metricsRes.ok) {
+          metricsData = await metricsRes.json();
+        }
+
+        const perAppMetrics = metricsData.per_application_results || {};
+
+        const combined: Dataset[] = datasetsData.map(ds => {
+          const metrics = perAppMetrics[ds.application_name] || {};
+          return {
+            ...ds,
+            ground_truth_size: metrics.ground_truth_size,
+            coverage: metrics.coverage,
+            validation_status: 'valid' // Defaulting to valid assuming it's returned by the API if present
+          };
+        });
+
+        setDatasets(combined);
+      } catch (error) {
+        console.error("Error fetching datasets:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
   }, []);
 
   return (
@@ -54,12 +87,12 @@ export default function DatasetsPage() {
       ) : (
         <motion.div initial="hidden" animate="visible" variants={stagger} className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {datasets.map((dataset) => (
-            <motion.div key={dataset.app_name} variants={fadeIn} className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-xl p-6 hover:border-slate-700 transition-colors group">
+            <motion.div key={dataset.application_name} variants={fadeIn} className="bg-slate-900/50 backdrop-blur-md border border-slate-800 rounded-xl p-6 hover:border-slate-700 transition-colors group">
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <h3 className="text-xl font-semibold text-slate-200 flex items-center gap-2">
                     <Database className="w-5 h-5 text-indigo-400" />
-                    {dataset.app_name}
+                    {dataset.application_name}
                   </h3>
                   <span className="inline-flex items-center gap-1 mt-2 text-xs font-medium px-2 py-1 rounded-md bg-slate-800 text-slate-300">
                     v{dataset.dataset_version}
@@ -98,7 +131,7 @@ export default function DatasetsPage() {
                 </div>
                 <div>
                   <p className="text-xs text-slate-500 mb-1">Coverage</p>
-                  <p className="text-lg font-semibold text-slate-200">{dataset.coverage ? `${dataset.coverage}%` : '-'}</p>
+                  <p className="text-lg font-semibold text-slate-200">{dataset.coverage != null ? `${(dataset.coverage * 100).toFixed(1)}%` : '-'}</p>
                 </div>
               </div>
             </motion.div>

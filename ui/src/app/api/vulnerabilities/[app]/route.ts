@@ -59,11 +59,12 @@ export async function GET(
     for (const llm of llmData) {
       if (llm.route_id) {
         const existing = routesMap.get(llm.route_id) || { route_id: llm.route_id };
+        const cls = llm.llm_classification;
         routesMap.set(llm.route_id, {
           ...existing,
-          llm_flagged: llm.is_vulnerable,
-          llm_confidence: llm.confidence || 0,
-          llm_explanation: llm.explanation || '',
+          llm_flagged: cls?.is_vulnerable ?? false,
+          llm_confidence: cls?.confidence || 'NONE',
+          llm_explanation: cls?.explanation || '',
         });
       }
     }
@@ -71,10 +72,15 @@ export async function GET(
     for (const v of verifiedData) {
       if (v.route_id) {
         const existing = routesMap.get(v.route_id) || { route_id: v.route_id };
+        const ver = v.verification;
+        const verStatus = ver?.verification_status || 'NOT_TESTED';
         routesMap.set(v.route_id, {
           ...existing,
-          dynamically_verified: v.dynamically_verified,
-          final_verdict: v.final_verdict || 'not_evaluated',
+          dynamically_verified: verStatus === 'CONFIRMED_VULNERABLE',
+          verification_status: verStatus,
+          final_verdict: verStatus === 'CONFIRMED_VULNERABLE' ? 'vulnerable' :
+                         verStatus === 'NOT_VULNERABLE' ? 'not_vulnerable' :
+                         verStatus === 'INCONCLUSIVE' ? 'inconclusive' : 'not_tested',
         });
       }
     }
@@ -87,17 +93,21 @@ export async function GET(
         risk_level = 'medium';
       }
 
+      const isMatched = r.static_flagged || r.http_method !== undefined;
+
       return {
         route_id: r.route_id,
         http_method: r.http_method || 'UNKNOWN',
         endpoint: r.endpoint || 'unknown',
         static_flagged: r.static_flagged || false,
         llm_flagged: r.llm_flagged || false,
-        llm_confidence: r.llm_confidence || 0,
+        llm_confidence: r.llm_confidence || 'NONE',
         llm_explanation: r.llm_explanation || '',
         dynamically_verified: r.dynamically_verified || false,
-        final_verdict: r.final_verdict || 'not_evaluated',
+        verification_status: r.verification_status || 'NOT_TESTED',
+        final_verdict: r.final_verdict || 'not_tested',
         ground_truth: r.ground_truth !== undefined ? r.ground_truth : null,
+        is_matched: isMatched,
         risk_level,
       };
     });
