@@ -1,0 +1,160 @@
+{
+  "run_timestamp": "20260725T125425Z",
+  "applications_tested": [
+    "vuln-nodejs-app",
+    "juice_shop"
+  ],
+  "applications_successful": [
+    "vuln-nodejs-app",
+    "juice_shop"
+  ],
+  "applications_failed": [],
+  "per_application_results": {
+    "vuln-nodejs-app": {
+      "ground_truth_size": 8,
+      "routes_evaluated": 4,
+      "routes_skipped": 0,
+      "coverage": 0.5,
+      "stage_1_static_only": {
+        "tp": 0,
+        "fp": 4,
+        "fn": 4,
+        "tn": 0,
+        "evaluated": 4,
+        "skipped": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "false_positive_rate": 1.0,
+        "false_negative_rate": 1.0,
+        "accuracy": 0.0
+      },
+      "stage_2_static_plus_llm": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 4,
+        "tn": 4,
+        "evaluated": 4,
+        "skipped": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 1.0,
+        "accuracy": 0.5
+      },
+      "stage_3_final_system": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 4,
+        "tn": 4,
+        "evaluated": 4,
+        "skipped": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 1.0,
+        "accuracy": 0.5
+      },
+      "fp_reduction_stage1_to_stage2": 4,
+      "fp_reduction_stage2_to_stage3": 0,
+      "fp_reduction_stage1_to_stage3_total": 4
+    },
+    "juice_shop": {
+      "ground_truth_size": 58,
+      "routes_evaluated": 58,
+      "routes_skipped": 0,
+      "coverage": 1.0,
+      "stage_1_static_only": {
+        "tp": 6,
+        "fp": 52,
+        "fn": 0,
+        "tn": 0,
+        "evaluated": 58,
+        "skipped": 0,
+        "precision": 0.1034,
+        "recall": 1.0,
+        "f1": 0.1875,
+        "false_positive_rate": 1.0,
+        "false_negative_rate": 0.0,
+        "accuracy": 0.1034
+      },
+      "stage_2_static_plus_llm": {
+        "tp": 3,
+        "fp": 7,
+        "fn": 3,
+        "tn": 45,
+        "evaluated": 58,
+        "skipped": 0,
+        "precision": 0.3,
+        "recall": 0.5,
+        "f1": 0.375,
+        "false_positive_rate": 0.1346,
+        "false_negative_rate": 0.5,
+        "accuracy": 0.8276
+      },
+      "stage_3_final_system": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 6,
+        "tn": 52,
+        "evaluated": 58,
+        "skipped": 0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "false_positive_rate": 0.0,
+        "false_negative_rate": 1.0,
+        "accuracy": 0.8966
+      },
+      "fp_reduction_stage1_to_stage2": 45,
+      "fp_reduction_stage2_to_stage3": 7,
+      "fp_reduction_stage1_to_stage3_total": 52
+    }
+  },
+  "pooled_overall_results": {
+    "stage_1_static_only": {
+      "tp": 6,
+      "fp": 56,
+      "fn": 4,
+      "tn": 0,
+      "evaluated": 62,
+      "skipped": 0,
+      "precision": 0.0968,
+      "recall": 0.6,
+      "f1": 0.1667,
+      "false_positive_rate": 1.0,
+      "false_negative_rate": 0.4
+    },
+    "stage_2_static_plus_llm": {
+      "tp": 3,
+      "fp": 7,
+      "fn": 7,
+      "tn": 49,
+      "evaluated": 62,
+      "skipped": 0,
+      "precision": 0.3,
+      "recall": 0.3,
+      "f1": 0.3,
+      "false_positive_rate": 0.125,
+      "false_negative_rate": 0.7
+    },
+    "stage_3_final_system": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 10,
+      "tn": 56,
+      "evaluated": 62,
+      "skipped": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "false_positive_rate": 0.0,
+      "false_negative_rate": 1.0
+    },
+    "fp_reduction_stage1_to_stage2": 49,
+    "fp_reduction_stage2_to_stage3": 7,
+    "fp_reduction_stage1_to_stage3_total": 56
+  }
+}

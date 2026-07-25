@@ -110,27 +110,36 @@ def classify_route(route: StaticAnalysisResult) -> LlmClassification:
     # The implementation writes once here with the eventual parsed_successfully
     # value by deferring the write until after the parse attempt below.
 
-    # ── Step 5: parse into LlmClassification ──────────────────────────
-    parsed_successfully = False
-    classification: LlmClassification
+    # ── Step 4 + 5: parse with robust multi-strategy parser ─────────
+    from .response_parser import parse_llm_response
 
-    try:
-        classification = LlmClassification.model_validate_json(raw_response)
+    parse_result = parse_llm_response(raw_response)
+
+    if parse_result.success:
+        classification = parse_result.classification  # type: ignore[assignment]
         parsed_successfully = True
-    except (ValidationError, ValueError, Exception) as exc:
-        logger.warning(
-            "Failed to parse LLM response for route %s: %s\nRaw: %.300s",
+        logger.info(
+            "Parsed LLM response for route %s (strategy=%s)",
             route.route_id,
-            exc,
+            parse_result.strategy_used,
+        )
+    else:
+        logger.warning(
+            "All parsing strategies exhausted for route %s. "
+            "Error: %s\nRaw response (first 300 chars): %.300s",
+            route.route_id,
+            parse_result.error_message,
             raw_response,
         )
         classification = _FALLBACK_CLASSIFICATION
+        parsed_successfully = False
 
-    # ── Step 4 (deferred): write output log with final parsed_successfully ──
+    # ── Log output with full parse diagnostics ────────────────────────
     log_llm_output(
         route_id=route.route_id,
         raw_response=raw_response,
         parsed_successfully=parsed_successfully,
+        parse_diagnostics=parse_result.to_log_dict(),
     )
 
     return classification

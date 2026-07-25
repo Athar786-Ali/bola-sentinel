@@ -1,7 +1,0 @@
-{
-  "route_id": "route_x",
-  "timestamp": "20260708T212659218342Z",
-  "model": "qwen2.5:7b-instruct",
-  "system_prompt": "s",
-  "user_prompt": "u"
-}

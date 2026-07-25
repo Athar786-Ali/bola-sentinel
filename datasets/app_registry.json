@@ -1,0 +1,37 @@
+[
+  {
+    "_comment": "Registry of target applications for the bola-sentinel benchmark.",
+    "_notes": [
+      "Each application needs its own test_users.json for Phase 3 dynamic verification.",
+      "test_users_file follows the exact Phase 3 schema: user_a/user_b with auth_header, user_id, owned_object_ids.",
+      "ground_truth_file is the Phase 4 ground-truth JSON for this application only.",
+      "base_url must point to a running instance of the application during Phase 3.",
+      "Add new entries here when onboarding a new application to the benchmark."
+    ],
+    "application_name": "SCHEMA_PLACEHOLDER",
+    "source_path": "datasets/TEMPLATE/",
+    "base_url": "http://localhost:PORT",
+    "test_users_file": "datasets/TEMPLATE/test_users.json",
+    "ground_truth_file": "datasets/ground_truth/TEMPLATE.json",
+    "git_commit": "<specific_hash>",
+    "dataset_version": "1.0.0"
+  },
+  {
+    "application_name": "vuln-nodejs-app",
+    "source_path": "datasets/intentionally_vulnerable/vuln-nodejs-app/",
+    "base_url": "http://localhost:9000",
+    "test_users_file": "datasets/intentionally_vulnerable/vuln-nodejs-app/test_users.json",
+    "ground_truth_file": "datasets/ground_truth/vuln-nodejs-app.json",
+    "git_commit": "bc3c90920ba4e1c668d954e5027d9ca814d2d5c6",
+    "dataset_version": "1.0.0"
+  },
+  {
+    "application_name": "juice_shop",
+    "source_path": "datasets/juice_shop/source",
+    "base_url": "http://localhost:3000",
+    "test_users_file": "datasets/juice_shop/test_users.json",
+    "ground_truth_file": "datasets/ground_truth/juice_shop.json",
+    "git_commit": "a520e158cb65c43d24e2c55d84f09b05a2511a03",
+    "dataset_version": "1.0.0"
+  }
+]

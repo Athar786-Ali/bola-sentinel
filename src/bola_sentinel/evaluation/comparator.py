@@ -15,7 +15,7 @@ import logging
 
 from bola_sentinel.models.schemas import VerifiedRoute
 
-from .metrics import compute_confusion_matrix, compute_metrics_from_confusion
+from .metrics import compute_confusion_matrix, compute_coverage, compute_metrics_from_confusion
 from .stage_classifiers import (
     get_final_system_verdict,
     get_static_only_verdict,
@@ -46,8 +46,14 @@ def run_progressive_comparison(
         ``stage_1_static_only``, ``stage_2_static_plus_llm``,
         ``stage_3_final_system``, ``fp_reduction_stage1_to_stage2``,
         ``fp_reduction_stage2_to_stage3``, ``fp_reduction_stage1_to_stage3_total``,
-        ``ground_truth_size``, ``routes_evaluated``, ``routes_skipped``.
+        ``ground_truth_size``, ``routes_evaluated``, ``routes_skipped``,
+        ``coverage``.
     """
+    # ── Coverage (discovery capability, independent of classification) ──
+    coverage = compute_coverage(verified_routes, ground_truth)
+    logger.info("Coverage: %.1f%% (%d/%d ground-truth routes discovered)",
+                coverage * 100, int(coverage * len(ground_truth)), len(ground_truth))
+
     # ── Stage 1: Static Analysis Only ─────────────────────────────────
     cm1 = compute_confusion_matrix(verified_routes, ground_truth, get_static_only_verdict)
     m1 = compute_metrics_from_confusion(cm1)
@@ -87,6 +93,7 @@ def run_progressive_comparison(
         "ground_truth_size": gt_size,
         "routes_evaluated": evaluated,
         "routes_skipped": skipped,
+        "coverage": coverage,
         "stage_1_static_only": m1,
         "stage_2_static_plus_llm": m2,
         "stage_3_final_system": m3,
@@ -100,5 +107,5 @@ def _log_summary(m: dict) -> str:
     return (
         f"TP={m['tp']} FP={m['fp']} FN={m['fn']} TN={m['tn']}  "
         f"P={m['precision']:.3f} R={m['recall']:.3f} F1={m['f1']:.3f} "
-        f"FPR={m['false_positive_rate']:.3f}"
+        f"FPR={m['false_positive_rate']:.3f} Acc={m['accuracy']:.3f}"
     )

@@ -1,0 +1,698 @@
+[
+  {
+    "route_id": "POST_/file-upload_309",
+    "http_method": "POST",
+    "endpoint": "/file-upload",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/profile/image/file_310",
+    "http_method": "POST",
+    "endpoint": "/profile/image/file",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/profile/image/url_311",
+    "http_method": "POST",
+    "endpoint": "/profile/image/url",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/rest/memories_312",
+    "http_method": "POST",
+    "endpoint": "/rest/memories",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/api/Products_369",
+    "http_method": "POST",
+    "endpoint": "/api/Products",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "DELETE_/api/Products/:id_371",
+    "http_method": "DELETE",
+    "endpoint": "/api/Products/:id",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/api/Challenges_373",
+    "http_method": "POST",
+    "endpoint": "/api/Challenges",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/api/Hints_376",
+    "http_method": "POST",
+    "endpoint": "/api/Hints",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/api/Complaints_382",
+    "http_method": "POST",
+    "endpoint": "/api/Complaints",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/api/Recycles_386",
+    "http_method": "POST",
+    "endpoint": "/api/Recycles",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "PUT_/api/Recycles/:id_389",
+    "http_method": "PUT",
+    "endpoint": "/api/Recycles/:id",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "DELETE_/api/Recycles/:id_390",
+    "http_method": "DELETE",
+    "endpoint": "/api/Recycles/:id",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/api/SecurityQuestions_392",
+    "http_method": "POST",
+    "endpoint": "/api/SecurityQuestions",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/api/Feedbacks_402",
+    "http_method": "POST",
+    "endpoint": "/api/Feedbacks",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/api/Feedbacks_404",
+    "http_method": "POST",
+    "endpoint": "/api/Feedbacks",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/api/Feedbacks_406",
+    "http_method": "POST",
+    "endpoint": "/api/Feedbacks",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/api/Users_408",
+    "http_method": "POST",
+    "endpoint": "/api/Users",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/api/Users_420",
+    "http_method": "POST",
+    "endpoint": "/api/Users",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/api/Users_421",
+    "http_method": "POST",
+    "endpoint": "/api/Users",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/api/Users_422",
+    "http_method": "POST",
+    "endpoint": "/api/Users",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "PUT_/api/BasketItems/:id_426",
+    "http_method": "PUT",
+    "endpoint": "/api/BasketItems/:id",
+    "actually_vulnerable": true,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 1.0,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/api/BasketItems_427",
+    "http_method": "POST",
+    "endpoint": "/api/BasketItems",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "DELETE_/api/Quantitys/:id_429",
+    "http_method": "DELETE",
+    "endpoint": "/api/Quantitys/:id",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/api/Quantitys_430",
+    "http_method": "POST",
+    "endpoint": "/api/Quantitys",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "PUT_/api/Feedbacks/:id_433",
+    "http_method": "PUT",
+    "endpoint": "/api/Feedbacks/:id",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/api/Cards_438",
+    "http_method": "POST",
+    "endpoint": "/api/Cards",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "PUT_/api/Cards/:id_440",
+    "http_method": "PUT",
+    "endpoint": "/api/Cards/:id",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "DELETE_/api/Cards/:id_441",
+    "http_method": "DELETE",
+    "endpoint": "/api/Cards/:id",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/api/PrivacyRequests_444",
+    "http_method": "POST",
+    "endpoint": "/api/PrivacyRequests",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/api/Addresss_448",
+    "http_method": "POST",
+    "endpoint": "/api/Addresss",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "PUT_/api/Addresss/:id_450",
+    "http_method": "PUT",
+    "endpoint": "/api/Addresss/:id",
+    "actually_vulnerable": true,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 1.0,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "DELETE_/api/Addresss/:id_451",
+    "http_method": "DELETE",
+    "endpoint": "/api/Addresss/:id",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/rest/2fa/verify_458",
+    "http_method": "POST",
+    "endpoint": "/rest/2fa/verify",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/rest/2fa/setup_465",
+    "http_method": "POST",
+    "endpoint": "/rest/2fa/setup",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/rest/2fa/disable_471",
+    "http_method": "POST",
+    "endpoint": "/rest/2fa/disable",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/rest/user/login_596",
+    "http_method": "POST",
+    "endpoint": "/rest/user/login",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/rest/user/reset-password_598",
+    "http_method": "POST",
+    "endpoint": "/rest/user/reset-password",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/rest/basket/:id/checkout_604",
+    "http_method": "POST",
+    "endpoint": "/rest/basket/:id/checkout",
+    "actually_vulnerable": true,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 1.0,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "PUT_/rest/basket/:id/coupon/:coupon_605",
+    "http_method": "PUT",
+    "endpoint": "/rest/basket/:id/coupon/:coupon",
+    "actually_vulnerable": true,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 1.0,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "PUT_/rest/continue-code-findIt/apply/:continueCode_612",
+    "http_method": "PUT",
+    "endpoint": "/rest/continue-code-findIt/apply/:continueCode",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "PUT_/rest/continue-code-fixIt/apply/:continueCode_613",
+    "http_method": "PUT",
+    "endpoint": "/rest/continue-code-fixIt/apply/:continueCode",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "PUT_/rest/continue-code/apply/:continueCode_614",
+    "http_method": "PUT",
+    "endpoint": "/rest/continue-code/apply/:continueCode",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/rest/user/data-export_620",
+    "http_method": "POST",
+    "endpoint": "/rest/user/data-export",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/rest/user/data-export_621",
+    "http_method": "POST",
+    "endpoint": "/rest/user/data-export",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "PUT_/rest/order-history/:id/delivery-status_625",
+    "http_method": "PUT",
+    "endpoint": "/rest/order-history/:id/delivery-status",
+    "actually_vulnerable": true,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 1.0,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "PUT_/rest/wallet/balance_627",
+    "http_method": "PUT",
+    "endpoint": "/rest/wallet/balance",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/rest/deluxe-membership_629",
+    "http_method": "POST",
+    "endpoint": "/rest/deluxe-membership",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "PUT_/rest/products/:id/reviews_633",
+    "http_method": "PUT",
+    "endpoint": "/rest/products/:id/reviews",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "PATCH_/rest/products/reviews_634",
+    "http_method": "PATCH",
+    "endpoint": "/rest/products/reviews",
+    "actually_vulnerable": true,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 1.0,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/rest/products/reviews_635",
+    "http_method": "POST",
+    "endpoint": "/rest/products/reviews",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/rest/chat_638",
+    "http_method": "POST",
+    "endpoint": "/rest/chat",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/rest/web3/submitKey_641",
+    "http_method": "POST",
+    "endpoint": "/rest/web3/submitKey",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/rest/web3/walletNFTVerify_644",
+    "http_method": "POST",
+    "endpoint": "/rest/web3/walletNFTVerify",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/rest/web3/walletExploitAddress_645",
+    "http_method": "POST",
+    "endpoint": "/rest/web3/walletExploitAddress",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/b2b/v2/orders_648",
+    "http_method": "POST",
+    "endpoint": "/b2b/v2/orders",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/profile_667",
+    "http_method": "POST",
+    "endpoint": "/profile",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/snippets/verdict_671",
+    "http_method": "POST",
+    "endpoint": "/snippets/verdict",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  },
+  {
+    "route_id": "POST_/snippets/fixes_673",
+    "http_method": "POST",
+    "endpoint": "/snippets/fixes",
+    "actually_vulnerable": false,
+    "source": "code_review",
+    "review_notes": {
+      "reviewer": "BOLA-Sentinel-Agent",
+      "confidence_score": 0.8,
+      "rationale": "Verified from server.ts and route handlers."
+    }
+  }
+]

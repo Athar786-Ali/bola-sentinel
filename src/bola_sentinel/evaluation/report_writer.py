@@ -76,6 +76,7 @@ def write_markdown_report(
     gt_size = comparison["ground_truth_size"]
     evaluated = comparison["routes_evaluated"]
     skipped = comparison["routes_skipped"]
+    coverage = comparison.get("coverage", 0.0)
 
     lines: list[str] = []
 
@@ -84,17 +85,21 @@ def write_markdown_report(
         "# BOLA-Sentinel Evaluation Report",
         "",
         "> **Reproducibility**: All numbers in this report are derived from "
-        "`results/final_verified_results.json`, `datasets/ground_truth/`, and "
-        "`logs/evaluation_logs/`.  Re-running `bola-sentinel evaluate` on the same "
+        "`results/final_verified_results.json`, `datasets/ground_truth/{app_name}.json`, and "
+        "`logs/evaluation_logs/`.  Re-running `bola-sentinel evaluate --app-name {app_name}` on the same "
         "inputs will produce identical results.",
+        "",
+        "> This benchmark summary reflects the corrected evaluation "
+        "logic introduced after the evaluation audit.",
         "",
         "## Overview",
         "",
-        f"| Item | Count |",
+        f"| Item | Value |",
         f"|------|-------|",
         f"| Ground-truth routes | {gt_size} |",
-        f"| Routes evaluated (matched to ground truth) | {evaluated} |",
-        f"| Routes skipped (no ground-truth label) | {skipped} |",
+        f"| Routes discovered by pipeline | {evaluated} |",
+        f"| Pipeline routes without GT label | {skipped} |",
+        f"| Coverage | {_pct(coverage)} |",
         f"| CONFIRMED_VULNERABLE findings | {len(standardized_findings)} |",
         "",
     ]
@@ -105,23 +110,41 @@ def write_markdown_report(
         "",
         "Each stage is a checkpoint of the **same pipeline**, not an independent tool.",
         "",
-        "| Stage | TP | FP | FN | TN | Precision | Recall | F1 | FPR | FNR |",
-        "|-------|----|----|----|----|-----------|--------|-----|-----|-----|",
+        "| Stage | TP | FP | FN | TN | Precision | Recall | F1 | FPR | Accuracy |",
+        "|-------|----|----|----|----|-----------|--------|-----|-----|----------|",
         f"| **Stage 1** – Static Analysis Only | "
         f"{s1['tp']} | {s1['fp']} | {s1['fn']} | {s1['tn']} | "
         f"{_fmt(s1['precision'])} | {_fmt(s1['recall'])} | {_fmt(s1['f1'])} | "
-        f"{_pct(s1['false_positive_rate'])} | {_pct(s1['false_negative_rate'])} |",
+        f"{_pct(s1['false_positive_rate'])} | {_fmt(s1.get('accuracy', 0.0))} |",
         f"| **Stage 2** – Static + LLM Reasoning | "
         f"{s2['tp']} | {s2['fp']} | {s2['fn']} | {s2['tn']} | "
         f"{_fmt(s2['precision'])} | {_fmt(s2['recall'])} | {_fmt(s2['f1'])} | "
-        f"{_pct(s2['false_positive_rate'])} | {_pct(s2['false_negative_rate'])} |",
+        f"{_pct(s2['false_positive_rate'])} | {_fmt(s2.get('accuracy', 0.0))} |",
         f"| **Stage 3** – Full Pipeline (Final) | "
         f"{s3['tp']} | {s3['fp']} | {s3['fn']} | {s3['tn']} | "
         f"{_fmt(s3['precision'])} | {_fmt(s3['recall'])} | {_fmt(s3['f1'])} | "
-        f"{_pct(s3['false_positive_rate'])} | {_pct(s3['false_negative_rate'])} |",
+        f"{_pct(s3['false_positive_rate'])} | {_fmt(s3.get('accuracy', 0.0))} |",
         "",
-        "> FPR = False Positive Rate = FP / (FP + TN).  "
-        "FNR = False Negative Rate = FN / (FN + TP).",
+        f"**Coverage**: {_pct(coverage)} — {evaluated} of {gt_size} ground-truth "
+        "routes were discovered by the pipeline.",
+        "",
+        "> FPR = FP / (FP + TN).  "
+        "Coverage = discovered ground-truth routes / total ground-truth routes.  "
+        "Accuracy = (TP + TN) / (TP + FP + FN + TN).",
+        "",
+        "## Coverage vs Recall — Definition",
+        "",
+        "These two metrics are intentionally kept **independent**:",
+        "",
+        "| Metric | Measures | Formula |",
+        "|--------|----------|--------|",
+        "| **Coverage** | How many ground-truth routes were *discovered* by the pipeline (regardless of classification) | discovered GT routes / total GT routes |",
+        "| **Recall** | How many actual vulnerable routes were *correctly classified* as vulnerable | TP / (TP + FN) |",
+        "| **Precision** | How many predicted-vulnerable routes are *actually* vulnerable | TP / (TP + FP) |",
+        "",
+        "A pipeline can have high Coverage (finds all routes) but low Recall "
+        "(misclassifies them).  Conversely, a pipeline can have perfect Recall "
+        "on the routes it finds, but low Coverage if it misses most routes entirely.",
         "",
     ]
 

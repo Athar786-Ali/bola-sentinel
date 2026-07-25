@@ -1,7 +1,0 @@
-{
-  "route_id": "POST_/orders/{orderId}/cancel_42",
-  "timestamp": "20260708T212659176295Z",
-  "model": "qwen2.5:7b-instruct",
-  "raw_response": "[ERROR: Cannot connect to Ollama]",
-  "parsed_successfully": false
-}

@@ -262,6 +262,10 @@ def verify(
 
 @app.command("evaluate")
 def evaluate(
+    app_name: str = typer.Option(
+        ..., "--app-name",
+        help="Application name (matches datasets/ground_truth/{app_name}.json).",
+    ),
     input_file: str = typer.Option(
         None, "--input", "-i",
         help="Verified results JSON. Defaults to <results_dir>/final_verified_results.json.",
@@ -285,7 +289,7 @@ def evaluate(
 
     from bola_sentinel.evaluation import (
         build_standardized_findings,
-        load_all_ground_truth,
+        load_ground_truth_for_app,
         run_progressive_comparison,
     )
     from bola_sentinel.evaluation.evaluation_logger import log_evaluation_run
@@ -306,14 +310,12 @@ def evaluate(
     raw_list = json.loads(in_path.read_text(encoding="utf-8"))
     verified_routes = [VerifiedRoute.model_validate(r) for r in raw_list]
 
-    # ── Load ground truth ────────────────────────────────────────────
+    # ── Load ground truth (app-scoped) ───────────────────────────────
     try:
-        ground_truth = load_all_ground_truth(ground_truth_dir)
+        ground_truth = load_ground_truth_for_app(app_name, ground_truth_dir)
     except (FileNotFoundError, ValueError) as exc:
         typer.echo(f"Error loading ground truth: {exc}", err=True)
         raise typer.Exit(code=1)
-
-    gt_file_count = len(list(Path(ground_truth_dir).glob("*.json")))
 
     # ── Run comparison ───────────────────────────────────────────────
     comparison = run_progressive_comparison(verified_routes, ground_truth)
@@ -337,7 +339,7 @@ def evaluate(
     # ── Log run for reproducibility ──────────────────────────────────
     log_evaluation_run(
         verified_route_count=len(verified_routes),
-        ground_truth_file_count=gt_file_count,
+        ground_truth_file_count=1,  # always exactly one file now
         ground_truth_route_count=len(ground_truth),
         routes_evaluated=comparison["routes_evaluated"],
         routes_skipped=comparison["routes_skipped"],
@@ -351,34 +353,39 @@ def evaluate(
     d12 = comparison["fp_reduction_stage1_to_stage2"]
     d23 = comparison["fp_reduction_stage2_to_stage3"]
     d13 = comparison["fp_reduction_stage1_to_stage3_total"]
+    cov = comparison["coverage"]
 
     def _row(label: str, m: dict) -> str:
         return (
             f"  {label:36s}  "
             f"P={m['precision']:.3f}  R={m['recall']:.3f}  "
             f"F1={m['f1']:.3f}  FPR={m['false_positive_rate']*100:.1f}%  "
-            f"FP={m['fp']}  TP={m['tp']}"
+            f"Acc={m['accuracy']:.3f}  "
+            f"FP={m['fp']}  FN={m['fn']}  TP={m['tp']}"
         )
 
-    typer.echo(f"\n{'─' * 76}")
+    typer.echo(f"\n{'─' * 80}")
     typer.echo(f"  Evaluation Complete — Progressive Stage Comparison")
-    typer.echo(f"{'─' * 76}")
-    typer.echo(f"  Ground-truth routes matched: {comparison['routes_evaluated']}")
-    typer.echo(f"  Routes without GT label:     {comparison['routes_skipped']}")
-    typer.echo(f"{'─' * 76}")
+    typer.echo(f"  Application: {app_name}")
+    typer.echo(f"{'─' * 80}")
+    typer.echo(f"  Ground-truth routes:         {comparison['ground_truth_size']}")
+    typer.echo(f"  Routes discovered by pipeline: {comparison['routes_evaluated']}")
+    typer.echo(f"  Pipeline routes without GT:    {comparison['routes_skipped']}")
+    typer.echo(f"  Coverage:                      {cov*100:.1f}%")
+    typer.echo(f"{'─' * 80}")
     typer.echo(_row("Stage 1  Static Only", s1))
     typer.echo(_row("Stage 2  Static + LLM", s2))
     typer.echo(_row("Stage 3  Full Pipeline (Final)", s3))
-    typer.echo(f"{'─' * 76}")
+    typer.echo(f"{'─' * 80}")
     typer.echo(f"  False-Positive Reduction:")
     typer.echo(f"    Stage 1 → 2 (adding LLM):               {d12:+d} FPs")
     typer.echo(f"    Stage 2 → 3 (adding dynamic verif.):    {d23:+d} FPs")
     typer.echo(f"    Stage 1 → 3 total reduction:            {d13:+d} FPs")
-    typer.echo(f"{'─' * 76}")
+    typer.echo(f"{'─' * 80}")
     typer.echo(f"  CONFIRMED_VULNERABLE findings:  {len(findings)}")
     typer.echo(f"  Metrics JSON:  {metrics_path}")
     typer.echo(f"  Report:        {report_path_str}")
-    typer.echo(f"{'─' * 76}\n")
+    typer.echo(f"{'─' * 80}\n")
 
 
 if __name__ == "__main__":

@@ -101,6 +101,7 @@ def log_llm_output(
     route_id: str,
     raw_response: str,
     parsed_successfully: bool,
+    parse_diagnostics: dict | None = None,
 ) -> Path:
     """
     Persist the raw LLM response immediately after it is received.
@@ -116,9 +117,10 @@ def log_llm_output(
         The verbatim string returned by call_ollama().
     parsed_successfully:
         True if the response was subsequently parsed into LlmClassification
-        without error.  Pass False first if calling before parsing; the
-        classifier may update this in a second call if needed — but the
-        simpler pattern is to call once after parsing with the known outcome.
+        without error.
+    parse_diagnostics:
+        Optional dict with details of each parsing strategy attempted,
+        produced by ``ParseResult.to_log_dict()``.
 
     Returns
     -------
@@ -132,13 +134,15 @@ def log_llm_output(
     filename = f"{_safe_name(route_id)}_{ts}.json"
     out_path = outputs_dir / filename
 
-    payload = {
+    payload: dict = {
         "route_id": route_id,
         "timestamp": ts,
         "model": settings.ollama_model,
         "raw_response": raw_response,
         "parsed_successfully": parsed_successfully,
     }
+    if parse_diagnostics is not None:
+        payload["parse_diagnostics"] = parse_diagnostics
 
     try:
         out_path.write_text(
@@ -149,3 +153,4 @@ def log_llm_output(
         logger.exception("Failed to write LLM output log for route %s", route_id)
 
     return out_path
+

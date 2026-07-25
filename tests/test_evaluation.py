@@ -22,7 +22,6 @@ from pathlib import Path
 import pytest
 
 from bola_sentinel.evaluation.comparator import run_progressive_comparison
-from bola_sentinel.evaluation.ground_truth_loader import load_all_ground_truth
 from bola_sentinel.evaluation.metrics import (
     compute_confusion_matrix,
     compute_metrics_from_confusion,
@@ -357,73 +356,68 @@ class TestStandardizedFindings:
 # ── (d) ground_truth_loader ───────────────────────────────────────────────
 
 class TestGroundTruthLoader:
-    """(d) Loader validation and merging behaviour."""
+    """(d) Loader validation and app-scoped loading behaviour."""
 
-    def test_missing_dir_raises_file_not_found(self, tmp_path: Path) -> None:
+    def test_missing_file_raises_file_not_found(self, tmp_path: Path) -> None:
+        from bola_sentinel.evaluation.ground_truth_loader import load_ground_truth_for_app
         with pytest.raises(FileNotFoundError, match="not found"):
-            load_all_ground_truth(str(tmp_path / "nonexistent"))
-
-    def test_empty_dir_returns_empty_dict(self, tmp_path: Path) -> None:
-        gt_dir = tmp_path / "gt"
-        gt_dir.mkdir()
-        result = load_all_ground_truth(str(gt_dir))
-        assert result == {}
+            load_ground_truth_for_app("nonexistent_app", str(tmp_path))
 
     def test_valid_file_loaded(self, tmp_path: Path) -> None:
-        gt_dir = tmp_path / "gt"
-        gt_dir.mkdir()
-        (gt_dir / "test.json").write_text(
+        from bola_sentinel.evaluation.ground_truth_loader import load_ground_truth_for_app
+        (tmp_path / "myapp.json").write_text(
             json.dumps([{"route_id": "r1", "actually_vulnerable": True}])
         )
-        result = load_all_ground_truth(str(gt_dir))
+        result = load_ground_truth_for_app("myapp", str(tmp_path))
         assert result == {"r1": True}
 
-    def test_multiple_files_merged(self, tmp_path: Path) -> None:
-        gt_dir = tmp_path / "gt"
-        gt_dir.mkdir()
-        (gt_dir / "a.json").write_text(
+    def test_only_named_file_loaded(self, tmp_path: Path) -> None:
+        """Other JSON files in the directory are NOT loaded."""
+        from bola_sentinel.evaluation.ground_truth_loader import load_ground_truth_for_app
+        (tmp_path / "myapp.json").write_text(
             json.dumps([{"route_id": "r1", "actually_vulnerable": True}])
         )
-        (gt_dir / "b.json").write_text(
+        (tmp_path / "other.json").write_text(
             json.dumps([{"route_id": "r2", "actually_vulnerable": False}])
         )
-        result = load_all_ground_truth(str(gt_dir))
-        assert result["r1"] is True
-        assert result["r2"] is False
+        (tmp_path / "EXAMPLE.json").write_text(
+            json.dumps([{"route_id": "r3", "actually_vulnerable": True}])
+        )
+        result = load_ground_truth_for_app("myapp", str(tmp_path))
+        assert "r1" in result
+        assert "r2" not in result
+        assert "r3" not in result
 
     def test_invalid_json_raises_value_error(self, tmp_path: Path) -> None:
-        gt_dir = tmp_path / "gt"
-        gt_dir.mkdir()
-        (gt_dir / "bad.json").write_text("not json!!!")
+        from bola_sentinel.evaluation.ground_truth_loader import load_ground_truth_for_app
+        (tmp_path / "bad.json").write_text("not json!!!")
         with pytest.raises(ValueError, match="bad.json"):
-            load_all_ground_truth(str(gt_dir))
+            load_ground_truth_for_app("bad", str(tmp_path))
 
     def test_missing_route_id_raises_value_error(self, tmp_path: Path) -> None:
-        gt_dir = tmp_path / "gt"
-        gt_dir.mkdir()
-        (gt_dir / "bad.json").write_text(
+        from bola_sentinel.evaluation.ground_truth_loader import load_ground_truth_for_app
+        (tmp_path / "bad.json").write_text(
             json.dumps([{"actually_vulnerable": True}])
         )
         with pytest.raises(ValueError, match="bad.json"):
-            load_all_ground_truth(str(gt_dir))
+            load_ground_truth_for_app("bad", str(tmp_path))
 
     def test_not_a_list_raises_value_error(self, tmp_path: Path) -> None:
-        gt_dir = tmp_path / "gt"
-        gt_dir.mkdir()
-        (gt_dir / "bad.json").write_text(json.dumps({"route_id": "r1"}))
+        from bola_sentinel.evaluation.ground_truth_loader import load_ground_truth_for_app
+        (tmp_path / "bad.json").write_text(json.dumps({"route_id": "r1"}))
         with pytest.raises(ValueError, match="bad.json"):
-            load_all_ground_truth(str(gt_dir))
+            load_ground_truth_for_app("bad", str(tmp_path))
 
-    def test_error_message_lists_all_failures(self, tmp_path: Path) -> None:
-        gt_dir = tmp_path / "gt"
-        gt_dir.mkdir()
-        (gt_dir / "bad1.json").write_text("not json")
-        (gt_dir / "bad2.json").write_text("also not json")
-        with pytest.raises(ValueError) as exc_info:
-            load_all_ground_truth(str(gt_dir))
-        msg = str(exc_info.value)
-        assert "bad1.json" in msg
-        assert "bad2.json" in msg
+    def test_multiple_entries_in_single_file(self, tmp_path: Path) -> None:
+        from bola_sentinel.evaluation.ground_truth_loader import load_ground_truth_for_app
+        (tmp_path / "myapp.json").write_text(json.dumps([
+            {"route_id": "r1", "actually_vulnerable": True},
+            {"route_id": "r2", "actually_vulnerable": False},
+        ]))
+        result = load_ground_truth_for_app("myapp", str(tmp_path))
+        assert result["r1"] is True
+        assert result["r2"] is False
+
 
 
 # ── (e) report_writer sections and correctness ────────────────────────────

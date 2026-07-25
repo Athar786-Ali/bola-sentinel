@@ -1,0 +1,130 @@
+[
+  {
+    "route_id": "POST_/comment_27",
+    "actually_vulnerable": false,
+    "source": "manual_code_audit",
+    "cve_id": null,
+    "cwe_id": "CWE-611",
+    "owasp_category": null,
+    "notes": "[POST /comment] XXE vulnerability (libxmljs.parseXmlString with noent:true). Not BOLA — no object-level access control issue.",
+    "source_reference": "controllers/vuln_controller.js:109-116",
+    "evidence": "libxmljs.parseXmlString(rawcomment, {noent: true, noblanks: true}); — parses arbitrary XML, no user-object binding.",
+    "review_metadata": {
+      "reviewer": "Security Researcher",
+      "review_date": "2026-07-25T11:00:00Z",
+      "confidence": "High"
+    }
+  },
+  {
+    "route_id": "POST_/save-preference_47",
+    "actually_vulnerable": false,
+    "source": "manual_code_audit",
+    "cve_id": null,
+    "cwe_id": "CWE-502",
+    "owasp_category": null,
+    "notes": "[POST /save-preference] Insecure Deserialization (node-serialize). Not BOLA — deserializes cookie, no DB query or object-level access.",
+    "source_reference": "controllers/vuln_controller.js:143-146",
+    "evidence": "serialize.unserialize(req.cookies.preference); — deserializes untrusted cookie data.",
+    "review_metadata": {
+      "reviewer": "Security Researcher",
+      "review_date": "2026-07-25T11:00:00Z",
+      "confidence": "High"
+    }
+  },
+  {
+    "route_id": "POST_/disable-totp_106",
+    "actually_vulnerable": false,
+    "source": "manual_code_audit",
+    "cve_id": null,
+    "cwe_id": null,
+    "owasp_category": null,
+    "notes": "[POST /disable-totp] SAFE. Uses req.user.username from JWT session for the WHERE clause. No user-controlled object ID.",
+    "source_reference": "controllers/vuln_controller.js:430-447",
+    "evidence": "Users.update({totpSecret: ''}, {where: {username: req.user.username}}) — ownership enforced via session.",
+    "review_metadata": {
+      "reviewer": "Security Researcher",
+      "review_date": "2026-07-25T11:00:00Z",
+      "confidence": "High"
+    }
+  },
+  {
+    "route_id": "POST_/unlock-secret_147",
+    "actually_vulnerable": false,
+    "source": "manual_code_audit",
+    "cve_id": null,
+    "cwe_id": "CWE-943",
+    "owasp_category": null,
+    "notes": "[POST /unlock-secret] NoSQL Injection via $where operator. Not BOLA — queries a shared 'secret' collection, no per-user object access.",
+    "source_reference": "controllers/vuln_controller.js:695-707",
+    "evidence": "db.collection('secret').find({$where: 'this.password ==\\''+req.body.password+'\\''}) — injection, not IDOR.",
+    "review_metadata": {
+      "reviewer": "Security Researcher",
+      "review_date": "2026-07-25T11:00:00Z",
+      "confidence": "High"
+    }
+  },
+  {
+    "route_id": "GET_/notes/user/:userid_57",
+    "actually_vulnerable": true,
+    "source": "manual_code_audit",
+    "cve_id": null,
+    "cwe_id": "CWE-639",
+    "owasp_category": "API1:2023 Broken Object Level Authorization",
+    "notes": "[GET /notes/user/:userid] BOLA. Fetches notes by userid from URL path parameter. No check that req.params.userid === req.user.id.",
+    "source_reference": "controllers/vuln_controller.js:188-195",
+    "evidence": "const userid = req.params.userid; Notes.findAll({where: {userid: userid}}) — attacker supplies arbitrary userid in URL.",
+    "review_metadata": {
+      "reviewer": "Security Researcher",
+      "review_date": "2026-07-25T11:00:00Z",
+      "confidence": "High"
+    }
+  },
+  {
+    "route_id": "POST_/organization/add-user_80",
+    "actually_vulnerable": true,
+    "source": "manual_code_audit",
+    "cve_id": null,
+    "cwe_id": "CWE-639",
+    "owasp_category": "API1:2023 Broken Object Level Authorization",
+    "notes": "[POST /organization/add-user] BOLA. Fetches authenticated user's org but then updates ANY user specified in req.body.user. Attacker can hijack arbitrary users into their organization.",
+    "source_reference": "controllers/vuln_controller.js:277-285",
+    "evidence": "Users.update({orgname: queryResult.orgname}, {where: {username: req.body.user}}) — target user is attacker-controlled.",
+    "review_metadata": {
+      "reviewer": "Security Researcher",
+      "review_date": "2026-07-25T11:00:00Z",
+      "confidence": "High"
+    }
+  },
+  {
+    "route_id": "POST_/graphql_124",
+    "actually_vulnerable": true,
+    "source": "manual_code_audit",
+    "cve_id": null,
+    "cwe_id": "CWE-639",
+    "owasp_category": "API1:2023 Broken Object Level Authorization",
+    "notes": "[POST /graphql → showProfile] BOLA via GraphQL. The showProfile resolver takes an arbitrary userid argument and returns full user record without checking ownership.",
+    "source_reference": "controllers/vuln_controller.js:576-582",
+    "evidence": "async function graphql_ShowProfile(args) { const q = 'SELECT * FROM users where id=\\'' + userid + '\\''; } — no req.user check.",
+    "review_metadata": {
+      "reviewer": "Security Researcher",
+      "review_date": "2026-07-25T11:00:00Z",
+      "confidence": "High"
+    }
+  },
+  {
+    "route_id": "POST_/mongodb-notes/show-notes_121",
+    "actually_vulnerable": true,
+    "source": "manual_code_audit",
+    "cve_id": null,
+    "cwe_id": "CWE-639",
+    "owasp_category": "API1:2023 Broken Object Level Authorization",
+    "notes": "[POST /mongodb-notes/show-notes] BOLA. Accepts arbitrary req.body.username and returns all notes for that user from MongoDB. No comparison with req.user.username.",
+    "source_reference": "controllers/vuln_controller.js:532-543",
+    "evidence": "db.collection('mongodb-notes').find({username: req.body.username}).toArray() — attacker controls username filter.",
+    "review_metadata": {
+      "reviewer": "Security Researcher",
+      "review_date": "2026-07-25T11:00:00Z",
+      "confidence": "High"
+    }
+  }
+]
