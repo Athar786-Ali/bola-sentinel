@@ -121,7 +121,7 @@ def analyze_codebase(root_path: str) -> list[StaticAnalysisResult]:
                 )
             )
 
-    # Deterministic ordering: file path → line number.
-    results.sort(key=lambda r: (r.file_path, r.line_number))
+    # Deterministic ordering: by route_id (which includes method, path, and line number).
+    results.sort(key=lambda r: r.route_id)
     logger.info("Extracted %d state-changing routes", len(results))
     return results

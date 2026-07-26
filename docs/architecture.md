@@ -39,6 +39,17 @@ UI, dashboard, and feature count are explicitly deprioritised.
 
 ---
 
+## Known Limitations
+
+The following API patterns are currently structurally out of scope for the static analyzer and dynamic verification engine:
+
+- **GraphQL APIs**: Single-endpoint APIs (e.g. `POST /graphql`) do not use REST-style path parameters for object IDs and lack HTTP method semantics. The AST extraction and resource-keyword matching logic cannot process them.
+- **Complex Router Chaining**: While basic chained routes (`router.route('/path').get(...)`) are supported, heavily nested or dynamically constructed routers may escape static detection.
+
+These limitations are documented and accepted; routes falling into these patterns should be excluded from ground-truth datasets to avoid artificial coverage gaps.
+
+---
+
 ## Four-Layer Architecture
 
 ```

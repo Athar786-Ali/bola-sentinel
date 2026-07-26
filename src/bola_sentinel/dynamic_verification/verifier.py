@@ -12,10 +12,75 @@ from pathlib import Path
 
 from bola_sentinel.models.schemas import ClassifiedRoute, VerificationResult, VerifiedRoute
 
+import httpx
+
 from .executor import execute_verification
 from .test_user_loader import load_test_users
 
 logger = logging.getLogger(__name__)
+
+
+def _refresh_tokens(test_users: dict, base_url: str) -> dict:
+    """
+    Re-authenticate test users to obtain fresh JWTs.
+
+    If a user entry contains ``login_email``, ``login_password``, and
+    ``login_url``, this function POSTs to the login endpoint and replaces
+    ``auth_header`` with the new token.
+
+    Falls back silently to the existing token if login fails — the
+    verification will then get 401s as before.
+    """
+    for user_key in ("user_a", "user_b"):
+        user = test_users.get(user_key, {})
+        email = user.get("login_email")
+        password = user.get("login_password")
+        login_url = user.get("login_url")
+
+        if not (email and password and login_url):
+            continue
+
+        url = base_url.rstrip("/") + login_url
+        try:
+            resp = httpx.post(
+                url,
+                json={"email": email, "password": password},
+                timeout=10.0,
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                # Support Juice Shop format: {"authentication": {"token": "..."}}
+                token = None
+                if "authentication" in data:
+                    token = data["authentication"].get("token")
+                elif "token" in data:
+                    token = data["token"]
+                elif "access_token" in data:
+                    token = data["access_token"]
+
+                if token:
+                    test_users[user_key]["auth_header"] = f"Bearer {token}"
+                    logger.info(
+                        "Token refresh for %s: success (via %s)",
+                        user_key, login_url,
+                    )
+                else:
+                    logger.warning(
+                        "Token refresh for %s: login returned 200 but no token found in response",
+                        user_key,
+                    )
+            else:
+                logger.warning(
+                    "Token refresh for %s: login returned HTTP %d — using existing token",
+                    user_key, resp.status_code,
+                )
+        except Exception as exc:
+            logger.warning(
+                "Token refresh for %s failed: %s — using existing token",
+                user_key, exc,
+            )
+
+    return test_users
 
 
 def verify_all_routes(
@@ -43,6 +108,48 @@ def verify_all_routes(
         One entry per input route, in the same order.
     """
     test_users = load_test_users(test_users_path)
+
+    # ── Token refresh ─────────────────────────────────────────────────
+    # If login credentials are provided, re-authenticate to get fresh
+    # JWTs.  This prevents expired-token failures during long benchmark
+    # runs where tokens issued at setup time may have expired.
+    test_users = _refresh_tokens(test_users, base_url)
+
+    # ── Pre-flight reachability check ─────────────────────────────────
+    # Verify the target application is actually reachable BEFORE running
+    # any probes.  Fail fast with a clear message instead of silently
+    # marking every route INCONCLUSIVE.
+    try:
+        preflight = httpx.get(base_url, timeout=10.0, follow_redirects=True)
+        logger.info(
+            "Pre-flight check: %s responded with HTTP %d — target is reachable.",
+            base_url,
+            preflight.status_code,
+        )
+    except (httpx.ConnectError, httpx.TimeoutException) as exc:
+        logger.error(
+            "Pre-flight check FAILED: target app at %s is not reachable (%s). "
+            "Start the target application before running verification.",
+            base_url,
+            exc,
+        )
+        # Return all routes — vulnerable ones get INCONCLUSIVE, others pass through.
+        fail_result = VerificationResult(
+            verification_status="INCONCLUSIVE",
+            notes=(
+                f"Target app at {base_url} is not reachable — "
+                f"start it before running verify. Error: {exc}"
+            ),
+        )
+        return [
+            VerifiedRoute(
+                **r.model_dump(),
+                verification=fail_result
+                if (r.llm_classification and r.llm_classification.is_vulnerable)
+                else None,
+            )
+            for r in classified_routes
+        ]
 
     to_verify = [
         r for r in classified_routes
@@ -80,7 +187,20 @@ def verify_all_routes(
             route.llm_classification.applicable_model if route.llm_classification else "—",
         )
 
-        vr = execute_verification(route, test_users, base_url)
+        try:
+            vr = execute_verification(route, test_users, base_url)
+        except Exception as exc:
+            logger.error(
+                "[%d/%d] Unexpected error verifying route %s: %s — marking INCONCLUSIVE",
+                i,
+                len(classified_routes),
+                route.route_id,
+                exc,
+            )
+            vr = VerificationResult(
+                verification_status="INCONCLUSIVE",
+                notes=f"Unexpected error during verification: {type(exc).__name__}: {exc}",
+            )
 
         logger.info(
             "  → verdict: %s  (state_changed=%s, http=%s)",

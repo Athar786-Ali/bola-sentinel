@@ -125,7 +125,13 @@ def execute_verification(
     # ── Step 2: Before-snapshot (best-effort) ──────────────────────────
     # Use the VICTIM's auth header for state reads so we confirm the object
     # exists and belongs to the victim.
-    victim_headers = {"Authorization": test_users["user_b"]["auth_header"]}
+    victim_auth = test_users["user_b"]["auth_header"]
+    victim_headers: dict[str, str] = {}
+    if ": " in victim_auth and not victim_auth.startswith("Bearer "):
+        header_name, header_val = victim_auth.split(": ", 1)
+        victim_headers[header_name] = header_val
+    else:
+        victim_headers["Authorization"] = victim_auth
 
     # Resolve the path for state reading: strip template syntax from the URL.
     attack_url_path = "/" + "/".join(attack["url"].split("/")[3:])
@@ -142,23 +148,23 @@ def execute_verification(
             )
 
     # ── Step 3: Send attack probe ──────────────────────────────────────
-    response_status: int
-    response_body: str
-    try:
-        resp = _client.request(
-            method=attack["method"],
-            url=attack["url"],
-            headers=attack["headers"],
+    # Skip DELETE probes — they can destroy test fixture state (e.g.
+    # cascading FK deletions in Juice Shop) and crash the target app.
+    if attack["method"] == "DELETE":
+        logger.info(
+            "Skipping DELETE probe for route %s — destructive operations "
+            "corrupt test fixture state for subsequent probes.",
+            route.route_id,
         )
-        response_status = resp.status_code
-        response_body = resp.text
-    except httpx.ConnectError as exc:
         result = VerificationResult(
             verification_status="INCONCLUSIVE",
             attacker_user_id=attacker_id,
             victim_object_id=victim_id,
             url_used=attack["url"],
-            notes=f"Target application unreachable: {exc}",
+            notes=(
+                "DELETE probe skipped — destructive operations can corrupt "
+                "test fixture state and crash the target application."
+            ),
         )
         log_verification_attempt(
             route_id=route.route_id,
@@ -172,6 +178,17 @@ def execute_verification(
         if _owns_client:
             _client.close()
         return result
+
+    response_status: int
+    response_body: str
+    try:
+        resp = _client.request(
+            method=attack["method"],
+            url=attack["url"],
+            headers=attack["headers"],
+        )
+        response_status = resp.status_code
+        response_body = resp.text
     except httpx.TimeoutException as exc:
         result = VerificationResult(
             verification_status="INCONCLUSIVE",
@@ -179,6 +196,28 @@ def execute_verification(
             victim_object_id=victim_id,
             url_used=attack["url"],
             notes=f"Request timed out: {exc}",
+        )
+        log_verification_attempt(
+            route_id=route.route_id,
+            attack_request=attack,
+            response_status=0,
+            response_body="",
+            state_before=state_before,
+            state_after=None,
+            final_verdict="INCONCLUSIVE",
+        )
+        if _owns_client:
+            _client.close()
+        return result
+    except httpx.RequestError as exc:
+        # Catches ConnectError, RemoteProtocolError, ReadError, WriteError,
+        # and any other transport-level failure.
+        result = VerificationResult(
+            verification_status="INCONCLUSIVE",
+            attacker_user_id=attacker_id,
+            victim_object_id=victim_id,
+            url_used=attack["url"],
+            notes=f"Transport error: {type(exc).__name__}: {exc}",
         )
         log_verification_attempt(
             route_id=route.route_id,

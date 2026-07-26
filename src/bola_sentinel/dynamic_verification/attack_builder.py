@@ -39,8 +39,8 @@ _PARAM_PATTERNS: list[tuple[re.Pattern[str], re.Pattern[str]]] = [
     (re.compile(r"\{(\w+)\}"), re.compile(r"\{(\w+)\}")),
     # Flask with type: <int:project_id>  or bare <project_id>
     (re.compile(r"<(?:\w+:)?(\w+)>"), re.compile(r"<(?:\w+:)?(\w+)>")),
-    # Express: :orderId (word chars after colon, not at start of scheme)
-    (re.compile(r"(?<!/):(\w+)"), re.compile(r"(?<!/):(\w+)")),
+    # Express: :orderId (must not match URL scheme if present, but we operate on path only)
+    (re.compile(r":(\w+)"), re.compile(r":(\w+)")),
 ]
 
 
@@ -58,7 +58,7 @@ def _is_param_segment(segment: str) -> bool:
     return bool(
         re.search(r"\{.+\}", segment)
         or re.search(r"<[^>]+>", segment)
-        or re.search(r"(?<!/):(\w+)", segment)
+        or re.search(r":(\w+)", segment)
     )
 
 
@@ -71,8 +71,8 @@ def _substitute_param(path: str, param_name: str, value: str) -> str:
     path = re.sub(re.escape("{" + param_name + "}"), value, path)
     # Flask with optional type prefix: <int:param_name> or <param_name>
     path = re.sub(r"<(?:\w+:)?" + re.escape(param_name) + r">", value, path)
-    # Express: :param_name (avoid matching scheme://)
-    path = re.sub(r"(?<!/):(" + re.escape(param_name) + r")\b", value, path)
+    # Express: :param_name
+    path = re.sub(r":(" + re.escape(param_name) + r")\b", value, path)
     return path
 
 
@@ -108,6 +108,10 @@ def _match_resource(
 
         norm_seg = _normalise(segment)
         if norm_seg not in normalised_owned:
+            logger.debug(
+                "[DEBUG-MATCH] Route path: %s. Tried keyword '%s' (normalised to '%s'). No match in test_users.json keys: %s",
+                route_path, segment, norm_seg, list(normalised_owned.keys())
+            )
             continue
 
         resource_key = normalised_owned[norm_seg]
@@ -123,6 +127,11 @@ def _match_resource(
             names = _extract_param_names(segments[i + 1])
             if names:
                 param_name = names[0]
+                
+        logger.debug(
+            "[DEBUG-MATCH] SUCCESS! Route path: %s -> matched segment '%s' to test_user key '%s'. ID param: %s",
+            route_path, segment, resource_key, param_name
+        )
 
         return resource_key, param_name, victim_id
 
@@ -197,13 +206,22 @@ def build_attack_request(
 
     url = base_url.rstrip("/") + resolved_path
 
+    # Parse the auth_header value: it may be in "HeaderName: value" format
+    # (e.g. "Cookie: authToken=xxx" or "Bearer xxx").
+    auth_value = user_a["auth_header"]
+    headers: dict[str, str] = {"Content-Type": "application/json"}
+    if ": " in auth_value and not auth_value.startswith("Bearer "):
+        # Full header format: "Cookie: authToken=xxx" or "Authorization: Bearer xxx"
+        header_name, header_val = auth_value.split(": ", 1)
+        headers[header_name] = header_val
+    else:
+        # Just a value — assume it's an Authorization header
+        headers["Authorization"] = auth_value
+
     return {
         "url": url,
         "method": route.http_method,
-        "headers": {
-            "Authorization": user_a["auth_header"],
-            "Content-Type": "application/json",
-        },
+        "headers": headers,
         "attacker_user_id": str(user_a["user_id"]),
         "victim_object_id": str(victim_id),
         "resource_type": resource_key,

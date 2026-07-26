@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import sys
 from collections import Counter
 from pathlib import Path
@@ -33,8 +34,9 @@ app = typer.Typer(
 
 def _setup_logging() -> None:
     """Configure basic logging to stderr."""
+    level = logging.DEBUG if os.environ.get("BOLA_DEBUG") else logging.INFO
     logging.basicConfig(
-        level=logging.INFO,
+        level=level,
         format="%(asctime)s  %(name)s  %(levelname)s  %(message)s",
         stream=sys.stderr,
     )

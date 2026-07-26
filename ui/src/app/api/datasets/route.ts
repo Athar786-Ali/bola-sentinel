@@ -16,6 +16,19 @@ export async function GET() {
     
     const filtered = registry.filter((entry: any) => entry.application_name !== 'SCHEMA_PLACEHOLDER');
     
+    // Add ground truth size by reading the GT files
+    for (const entry of filtered) {
+      if (entry.ground_truth_file) {
+        const gtPath = path.join(rootDir, entry.ground_truth_file);
+        if (fs.existsSync(gtPath)) {
+          const gtData = JSON.parse(fs.readFileSync(gtPath, 'utf-8'));
+          entry.ground_truth_size = Array.isArray(gtData) ? gtData.length : 0;
+        } else {
+          entry.ground_truth_size = 0;
+        }
+      }
+    }
+
     return NextResponse.json(filtered);
   } catch (error) {
     console.error('Error reading datasets:', error);

@@ -14,6 +14,14 @@ export async function GET() {
     const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
     const history = Array.isArray(data) ? data : (data.runs || []);
     
+    // Fix timestamp format for JS Date parsing (YYYYMMDDTHHMMSSZ -> YYYY-MM-DDTHH:MM:SSZ)
+    for (const run of history) {
+      if (run.run_timestamp && run.run_timestamp.length === 16 && !run.run_timestamp.includes('-')) {
+        const ts = run.run_timestamp;
+        run.run_timestamp = `${ts.substring(0,4)}-${ts.substring(4,6)}-${ts.substring(6,8)}T${ts.substring(9,11)}:${ts.substring(11,13)}:${ts.substring(13,15)}Z`;
+      }
+    }
+    
     return NextResponse.json(history);
   } catch (error) {
     console.error('Error reading history:', error);

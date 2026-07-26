@@ -80,14 +80,14 @@
     }
   },
   {
-    "route_id": "POST_/organization/add-user_80",
+    "route_id": "POST_/organization/add-user_79",
     "actually_vulnerable": true,
     "source": "manual_code_audit",
     "cve_id": null,
     "cwe_id": "CWE-639",
     "owasp_category": "API1:2023 Broken Object Level Authorization",
     "notes": "[POST /organization/add-user] BOLA. Fetches authenticated user's org but then updates ANY user specified in req.body.user. Attacker can hijack arbitrary users into their organization.",
-    "source_reference": "controllers/vuln_controller.js:277-285",
+    "source_reference": "routes/app.js:79-81, controllers/vuln_controller.js:277-285",
     "evidence": "Users.update({orgname: queryResult.orgname}, {where: {username: req.body.user}}) — target user is attacker-controlled.",
     "review_metadata": {
       "reviewer": "Security Researcher",
@@ -96,30 +96,14 @@
     }
   },
   {
-    "route_id": "POST_/graphql_124",
-    "actually_vulnerable": true,
-    "source": "manual_code_audit",
-    "cve_id": null,
-    "cwe_id": "CWE-639",
-    "owasp_category": "API1:2023 Broken Object Level Authorization",
-    "notes": "[POST /graphql → showProfile] BOLA via GraphQL. The showProfile resolver takes an arbitrary userid argument and returns full user record without checking ownership.",
-    "source_reference": "controllers/vuln_controller.js:576-582",
-    "evidence": "async function graphql_ShowProfile(args) { const q = 'SELECT * FROM users where id=\\'' + userid + '\\''; } — no req.user check.",
-    "review_metadata": {
-      "reviewer": "Security Researcher",
-      "review_date": "2026-07-25T11:00:00Z",
-      "confidence": "High"
-    }
-  },
-  {
-    "route_id": "POST_/mongodb-notes/show-notes_121",
+    "route_id": "POST_/mongodb-notes/show-notes_120",
     "actually_vulnerable": true,
     "source": "manual_code_audit",
     "cve_id": null,
     "cwe_id": "CWE-639",
     "owasp_category": "API1:2023 Broken Object Level Authorization",
     "notes": "[POST /mongodb-notes/show-notes] BOLA. Accepts arbitrary req.body.username and returns all notes for that user from MongoDB. No comparison with req.user.username.",
-    "source_reference": "controllers/vuln_controller.js:532-543",
+    "source_reference": "routes/app.js:120-121, controllers/vuln_controller.js:532-543",
     "evidence": "db.collection('mongodb-notes').find({username: req.body.username}).toArray() — attacker controls username filter.",
     "review_metadata": {
       "reviewer": "Security Researcher",

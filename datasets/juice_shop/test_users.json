@@ -1,25 +1,52 @@
 {
   "user_a": {
-    "auth_header": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdGF0dXMiOiJzdWNjZXNzIiwiZGF0YSI6eyJpZCI6MjEsInVzZXJuYW1lIjoiIiwiZW1haWwiOiJ1c2VyX2FAdGVzdC5jb20iLCJwYXNzd29yZCI6IjQ4MmM4MTFkYTVkNWI0YmM2ZDQ5N2ZmYTk4NDkxZTM4Iiwicm9sZSI6ImN1c3RvbWVyIiwiZGVsdXhlVG9rZW4iOiIiLCJsYXN0TG9naW5JcCI6IjAuMC4wLjAiLCJwcm9maWxlSW1hZ2UiOiIvYXNzZXRzL3B1YmxpYy9pbWFnZXMvdXBsb2Fkcy9kZWZhdWx0LnN2ZyIsInRvdHBTZWNyZXQiOiIiLCJpc0FjdGl2ZSI6dHJ1ZSwiY3JlYXRlZEF0IjoiMjAyNi0wNy0yNSAxMToyMjoxMi44NjEgKzAwOjAwIiwidXBkYXRlZEF0IjoiMjAyNi0wNy0yNSAxMToyMjoxMi44NjEgKzAwOjAwIiwiZGVsZXRlZEF0IjpudWxsfSwiaWF0IjoxNzg0OTc4NTMzLCJleHAiOjE3ODQ5OTY1MzN9.fGf8Ffz4paNmWhC18t_Vkj_fMh3p639xX_9VG8MfdjmOnQjTsd9jBjyKVp8-muy0yUsT1nfLx3I65oxsLD4SAy8IoeoIO6ARUDsgIYAkUmZ4Dj4R2KxUouVjggC90_rUv-WvV-WaDMSk4iEaHLvgNRtB2CYmWtBucFGATixhvQw",
-    "user_id": "6",
+    "auth_header": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdGF0dXMiOiJzdWNjZXNzIiwiZGF0YSI6eyJpZCI6MjEsInVzZXJuYW1lIjoiIiwiZW1haWwiOiJib2xhX2F0dGFja2VyQHRlc3QuY29tIiwicGFzc3dvcmQiOiI3YTFhZTY4MGZmNTNlN2ZkMWI2ZjEwOWMxYTc0Y2Q4ZCIsInJvbGUiOiJjdXN0b21lciIsImRlbHV4ZVRva2VuIjoiIiwibGFzdExvZ2luSXAiOiIwLjAuMC4wIiwicHJvZmlsZUltYWdlIjoiL2Fzc2V0cy9wdWJsaWMvaW1hZ2VzL3VwbG9hZHMvZGVmYXVsdC5zdmciLCJ0b3RwU2VjcmV0IjoiIiwiaXNBY3RpdmUiOnRydWUsImNyZWF0ZWRBdCI6IjIwMjYtMDctMjYgMTg6Mjc6MjguNTAxICswMDowMCIsInVwZGF0ZWRBdCI6IjIwMjYtMDctMjYgMTg6Mjc6MjguNTAxICswMDowMCIsImRlbGV0ZWRBdCI6bnVsbH0sImlhdCI6MTc4NTA5MjA2MywiZXhwIjoxNzg1MTEwMDYzfQ.M4JwnXgWBvzmbrv1h5QNGRSPbF9U9cOuK43f5RSXQy3el7WvjESus5Rmi9aMzzTurdHrRTMZGZQ1zhW2H5-YLaCpiw8J_0lL6zT2dDtUT79s8hNvzeZxuaj3wCV5G2zeq9Lb9CdXsBKyzWPD3QzYOK5JbpH5K1RCByzgkhzXahI",
+    "user_id": "21",
+    "login_email": "bola_attacker@test.com",
+    "login_password": "BolaSentinel1!",
+    "login_url": "/rest/user/login",
     "owned_object_ids": {
-      "baskets": [
-        "6"
+      "basket": [
+        "21"
       ],
-      "addresses": [
-        "7"
+      "products": [
+        "1"
       ]
     }
   },
   "user_b": {
-    "auth_header": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdGF0dXMiOiJzdWNjZXNzIiwiZGF0YSI6eyJpZCI6MjIsInVzZXJuYW1lIjoiIiwiZW1haWwiOiJ1c2VyX2JAdGVzdC5jb20iLCJwYXNzd29yZCI6IjQ4MmM4MTFkYTVkNWI0YmM2ZDQ5N2ZmYTk4NDkxZTM4Iiwicm9sZSI6ImN1c3RvbWVyIiwiZGVsdXhlVG9rZW4iOiIiLCJsYXN0TG9naW5JcCI6IjAuMC4wLjAiLCJwcm9maWxlSW1hZ2UiOiIvYXNzZXRzL3B1YmxpYy9pbWFnZXMvdXBsb2Fkcy9kZWZhdWx0LnN2ZyIsInRvdHBTZWNyZXQiOiIiLCJpc0FjdGl2ZSI6dHJ1ZSwiY3JlYXRlZEF0IjoiMjAyNi0wNy0yNSAxMToyMjoxMi45NDggKzAwOjAwIiwidXBkYXRlZEF0IjoiMjAyNi0wNy0yNSAxMToyMjoxMi45NDggKzAwOjAwIiwiZGVsZXRlZEF0IjpudWxsfSwiaWF0IjoxNzg0OTc4NTMzLCJleHAiOjE3ODQ5OTY1MzN9.P5csdzyapyw98MtbuDH5u_sQ6VvZCJjBew6gjZLjxQWrQ_TkTwLu3w1mkJtEBuwhFJya-OlAzl3Yk5QfqnlxKtpek2kor9RbIKbLdJtUDmVgsqLVqycHvq4duw9mmGpm_7e-yoyn_JuWabo_AS0oLWwcsMpBhlxx5M_9jBe3NEU",
-    "user_id": "7",
+    "auth_header": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdGF0dXMiOiJzdWNjZXNzIiwiZGF0YSI6eyJpZCI6MjIsInVzZXJuYW1lIjoiIiwiZW1haWwiOiJib2xhX3ZpY3RpbUB0ZXN0LmNvbSIsInBhc3N3b3JkIjoiN2ExYWU2ODBmZjUzZTdmZDFiNmYxMDljMWE3NGNkOGQiLCJyb2xlIjoiY3VzdG9tZXIiLCJkZWx1eGVUb2tlbiI6IiIsImxhc3RMb2dpbklwIjoiMC4wLjAuMCIsInByb2ZpbGVJbWFnZSI6Ii9hc3NldHMvcHVibGljL2ltYWdlcy91cGxvYWRzL2RlZmF1bHQuc3ZnIiwidG90cFNlY3JldCI6IiIsImlzQWN0aXZlIjp0cnVlLCJjcmVhdGVkQXQiOiIyMDI2LTA3LTI2IDE4OjI3OjI4LjU1MCArMDA6MDAiLCJ1cGRhdGVkQXQiOiIyMDI2LTA3LTI2IDE4OjI3OjI4LjU1MCArMDA6MDAiLCJkZWxldGVkQXQiOm51bGx9LCJpYXQiOjE3ODUwOTIwNjMsImV4cCI6MTc4NTExMDA2M30.I1htfwlXYtd3YLAArUxD15DzcWo5SVo4cgeN_XGRUcWWQZI4f70ysDrT4klyn-U6lyyZuGvyTXhfNh_sNUn3Enuj-0Lm9F_6Dl0KjwzR-WKfbXjamrgBVeco76eXdlhky9dZUpdnLw7qEoMSsSa5RJi7S6kGxCub63e74-YKPZ8",
+    "user_id": "22",
+    "login_email": "bola_victim@test.com",
+    "login_password": "BolaSentinel1!",
+    "login_url": "/rest/user/login",
     "owned_object_ids": {
-      "baskets": [
+      "basket": [
+        "22"
+      ],
+      "addresss": [
+        "8"
+      ],
+      "address": [
+        "8"
+      ],
+      "cards": [
         "7"
       ],
-      "addresses": [
-        "8"
+      "card": [
+        "7"
+      ],
+      "products": [
+        "1"
+      ],
+      "order-history": [
+        "1"
+      ],
+      "orders": [
+        "1"
+      ],
+      "reviews": [
+        "1"
       ]
     }
   }

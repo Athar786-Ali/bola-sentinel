@@ -50,7 +50,7 @@ export default function DatasetsPage() {
           const metrics = perAppMetrics[ds.application_name] || {};
           return {
             ...ds,
-            ground_truth_size: metrics.ground_truth_size,
+            ground_truth_size: metrics.ground_truth_size ?? ds.ground_truth_size,
             coverage: metrics.coverage,
             validation_status: 'valid' // Defaulting to valid assuming it's returned by the API if present
           };
